@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="条件随机场在篮球预测分析中的应用研究#####学位申请人：Archer Reilly #####指导老师：程戈 副教授 #####学院名称：数学与计算科学学院 #####学科专业：计算数学 #####研究方向：数字信号处理 摘要现有的针对篮球赛事的预测分析主要是使用一些简单的统计分析方法和专家人为预测分析，这些方法都存在效率低，准确率差的问题。本文旨在使用条件随机场模型来预测分析篮球比赛的结果。条">
+<meta property="og:type" content="website">
+<meta property="og:title" content="csrgxtu">
+<meta property="og:url" content="http://yoursite.com/GraduateThesis/条件随机场在篮球预测分析中的应用研究.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="条件随机场在篮球预测分析中的应用研究#####学位申请人：Archer Reilly #####指导老师：程戈 副教授 #####学院名称：数学与计算科学学院 #####学科专业：计算数学 #####研究方向：数字信号处理 摘要现有的针对篮球赛事的预测分析主要是使用一些简单的统计分析方法和专家人为预测分析，这些方法都存在效率低，准确率差的问题。本文旨在使用条件随机场模型来预测分析篮球比赛的结果。条">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://upload.wikimedia.org/math/5/6/f/56fb2d78dc8476d2700f6dd4454228db.png">
+<meta property="og:image" content="https://upload.wikimedia.org/math/3/4/8/3485bceb55d7ff520d4b6ac08e1d7831.png">
+<meta property="og:image" content="http://yoursite.com/img/local-markov-property.png">
+<meta property="og:image" content="http://yoursite.com/img/global-markov-property.png">
+<meta property="og:image" content="http://yoursite.com/img/linearchainmarkovrandomfields.png">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.022Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="csrgxtu">
+<meta name="twitter:description" content="条件随机场在篮球预测分析中的应用研究#####学位申请人：Archer Reilly #####指导老师：程戈 副教授 #####学院名称：数学与计算科学学院 #####学科专业：计算数学 #####研究方向：数字信号处理 摘要现有的针对篮球赛事的预测分析主要是使用一些简单的统计分析方法和专家人为预测分析，这些方法都存在效率低，准确率差的问题。本文旨在使用条件随机场模型来预测分析篮球比赛的结果。条">
+<meta name="twitter:image" content="https://upload.wikimedia.org/math/5/6/f/56fb2d78dc8476d2700f6dd4454228db.png">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/GraduateThesis/条件随机场在篮球预测分析中的应用研究.html" class="article-date">
+  	<time datetime="2020-09-23T17:55:12.022Z" itemprop="datePublished">2020-09-24</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="条件随机场在篮球预测分析中的应用研究"><a href="#条件随机场在篮球预测分析中的应用研究" class="headerlink" title="条件随机场在篮球预测分析中的应用研究"></a>条件随机场在篮球预测分析中的应用研究</h2><p>#####学位申请人：Archer Reilly</p>
+<p>#####指导老师：程戈 副教授</p>
+<p>#####学院名称：数学与计算科学学院</p>
+<p>#####学科专业：计算数学</p>
+<p>#####研究方向：数字信号处理</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>现有的针对篮球赛事的预测分析主要是使用一些简单的统计分析方法和专家人为预测分析，这些方法都存在效率低，准确率差的问题。本文旨在使用条件随机场模型来预测分析篮球比赛的结果。条件随机场模型是一种基于时间序列的统计模型，可以很好的适用于具有时序效应的篮球比赛数据中。主要通过大量的NBA比赛数据，通过有向图构建球队的之间的实力模型，使用实力值及其它相关的特征作为每个球队的特征向量，以此构建条件随机场模型来预测分析篮球比赛的胜负结果。  </p>
+<h5 id="关键词：条件随机场，篮球预测，球队实力"><a href="#关键词：条件随机场，篮球预测，球队实力" class="headerlink" title="关键词：条件随机场，篮球预测，球队实力"></a>关键词：条件随机场，篮球预测，球队实力</h5><h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>Sport result prediction is nowadays very popular among fans around the world, which particularly contributed to the expansion of sports betting. This makes the problem of predicting the results of sporting events, a new and interesting challenge. Consequently systems dealing with this problem are developed every day. This paper presents one such system, which uses data mining techniques in order to predict the outcomes of basketball games in NBA (National Basketball Association) league. The problem of predicting the game result is formalized as a labeling problem, where the Conditional Random Fields method is used. The system was evaluated on the dataset comprising 11921 games from the regular and offseason part of the 1991/2014 NBA season and it correctly predicted the winners of about 75% of matches.</p>
+<!-- ### 目录 -->
+<h4 id="第一章-引言"><a href="#第一章-引言" class="headerlink" title="第一章 引言"></a>第一章 引言</h4><h5 id="1-1-研究背景和问题概述"><a href="#1-1-研究背景和问题概述" class="headerlink" title="1.1 研究背景和问题概述"></a>1.1 研究背景和问题概述</h5><p>随着社会经济发展，人们的生活水平得到了显著提高，所以越来越多的人开始发展其它方面的兴趣爱好，例如有相当一部分人喜欢观看体育赛事，例如每四年一次的奥林匹克运动会。人们在观看赛事的时候特别喜欢预先知道哪一个队伍将要获胜，在体育爱好者中赛事结果预测越来越流行， 这对体育博彩的急剧膨胀贡献尤其的巨大，例如篮球，足球，棒球等球类运动。  </p>
+<p>NBA（美职篮），全称北美职业篮球联盟（National Basketball Association），是一个国际体育及媒体集团，由三个职业体育联盟组成：美国男子职业篮球联盟（NBA）、美国女子职业篮球联盟（WNBA）以及NBA发展联盟（NBA Development League）。其中NBA是世界上水平最高的篮球联赛、美国四大职业体育联赛之一。<br>超过6000万美国家庭可以收看到NBA电视台（NBA TV），NBA也是社交媒体上最受欢迎的体育联盟之一。联盟、球队以及球员的社交媒体平台拥有超过6亿的关注人群和粉丝。<a href="http://baike.baidu.com/item/nba" target="_blank" rel="noopener">baike</a>  </p>
+<p>NBA男篮现有32支球队，主要分为选秀，季前赛，常规赛，全明星赛，季后赛。其官网<a href="http://nba.stats.com" target="_blank" rel="noopener">http://nba.stats.com</a>收录了几乎所有的比赛统计数据。  </p>
+<p>体育博彩首先由主要的博彩公司开出特定的相关赔率，包括比分（得分），胜负平关联，甚至于特定时间内的比分。因为足球是世界上最受到公众瞩目的体育赛事之一，而且多数国家联赛；包括欧洲冠军联赛在一年内不间断式的进行，参与的球队数量以及影响力为其他运动所不及，所以称为体育博彩行业中最受到关注以及投入大量资金的运动。较知名的博彩公司如ac国际。中国体育博彩市场发展迅猛，有人估计达上万亿元人民币，超过政府对公共卫生事业的投入。<a href="https://zh.wikipedia.org/wiki/%E4%BD%93%E8%82%B2%E8%B5%8C%E5%8D%9A" target="_blank" rel="noopener">wiki</a></p>
+<p>国内篮球市场的繁荣,催动了我国篮球彩票的产生，在篮球市场发达的美国及欧洲获得了明显的效益.。篮球彩票作为体育博彩的一个重要组成部分,不仅给我国彩票市场注入了新的元素,而且满足了篮球迷们参与比赛的愿望。</p>
+<p>所以出现了许多体育博彩公司，专门为球迷提供购买博彩的依据。例如BET 365, BETWAY, BETVICTOR等国外公司，国内的主要有明升，申博， 同乐城等。<a href="http://www.xianmenol.com/bocaigongsi/279.html" target="_blank" rel="noopener">2015年度十大著名亚洲博彩公司排名</a>。</p>
+<p>现有的对篮球赛事的预测主要是通过一些简单的统计学方法，或者专家预测方法，或者是二者结合起来预测。因为特征选取，模型构造以及专家的局限性等诸多方面的原因，预测的结果都不是很准确。而且现有的解决方法并没有考虑到篮球比赛的时间前后关系。所以针对以上问题，本文提出了基于马儿科夫随机场的条件随机场模型来预测分析NBA篮球比赛。</p>
+<h5 id="1-2-国内外研究现状"><a href="#1-2-国内外研究现状" class="headerlink" title="1.2 国内外研究现状"></a>1.2 国内外研究现状</h5><p><a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=5647440&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D5647440" target="_blank" rel="noopener">The use of data mining for basketball outcome prediction</a>, 2010, Dragan Miljković; Ljubiša Gajić ; Aleksandar Kovačević ; Zora Konjović, IEEE.<br>2010年，Dragan等人通过将篮球比赛预测问题归类为一个分类问题，使用朴素贝叶斯分类器做分类，用多元回归分析计算每场比赛的展形，在此基础上实现了MVC 2 模型的软件系统。通过在2009/2010 NBA 常规赛季的778场比赛数据上训练预测，正确率可以达到大概67%。这篇文章的不足在于特征选取过于简单，因为只选了主场，客场，三分球等特征，而且朴素贝叶斯只能通过频率来近似计算，模型本身并不完美。</p>
+<p>This paper presents one such system, which uses data mining techniques in order to predict the outcomes of basketball games in NBA (National Basketball Association) league. The problem of predicting the game result is formalized as a classification problem, where the Naive Bayes method is used. Besides actual result, for each game system calculates the spread, by using multivariate linear regression. The MVC Model 2 pattern based software system is implemented. The system was evaluated on the dataset comprising 778 games from the regular part of the 2009/2010 NBA season and it correctly predicted the winners of about 67% of matches.</p>
+<p><a href="http://www.sciencedirect.com/science/article/pii/S0950705108000609" target="_blank" rel="noopener">A compound framework for sports results prediction: A football case study</a>, 2008, Byungho Min; Jinhyuck Kim; Chongyoun Choe; Hyeonsang Eom; R.I. (Bob) McKay; Knowledge-Based Systems, Pages 551–562; ScienceDirect<br>2008年， Byungho Min等人提出了一个复合框架来进行足球预测。  这个框架由两部分组成，分别是基于规则的推理和贝叶斯网络，通过考虑两部分来进行预测。主要考虑到体育比赛是高度随机的事件，并且同时一个队伍的策略可以通过一些简单的逻辑来近似。另外，因为使用了基于规则的推理，所以对于小数据量的比赛也可以做出很好的预测，相比机器学习就需要两个队伍之间有大量的比赛数据才能做出合理的预测。基于这个框架，我们实现了FRES(Football Result Expert System)并且展示了它能合理的稳定的预测。</p>
+<p>We propose a framework for sports prediction using Bayesian inference and rule-based reasoning, together with an in-game time-series approach. The framework is novel in three ways. The framework consists of two major components: a rule-based reasoner and a Bayesian network component. The two different approaches cooperate in predicting the results of sports matches. It is motivated by the observation that sports matches are highly stochastic, but at the same time, the strategies of a team can be approximated by crisp logic rules. Furthermore, because of the rule-based component, our framework can give reasonably good predictions even when statistical data is scanty: it can be used to predict results of matches between teams which have had few previous encounters. Machine learning techniques have great difficulty in handling such situations of insufficient data. Second, our framework is able to consider many factors, such as current scores, morale, fatigue, skills, etc. when it predicts the results of sports matches: most previous work considered only one factor, usually the score. Third, in contrast to most previous work on sports results prediction, we use a knowledge-based in-game time-series approach to predict sports matches. This approach enables our framework to reflect the tides/flows of a sports match, making our predictions certainly more realistic, and somewhat more accurate. We have implemented a football results predictor called FRES (Football Result Expert System) based on this framework, and show that it gives reasonable and stable predictions.</p>
+<p><a href="https://www.researchgate.net/publication/267197536_Using_Machine_Learning_to_Predict_the_Results_of_Sporting_Matches" target="_blank" rel="noopener">Using Machine Learning to Predict the Results of Sporting Matches</a>; 2014; Michael Baulch; ResearchGate<br>2014年，Michael Baulch使用人工智能神经网络对篮球比赛数据进行训练预测，其中使用后向算法和共轭梯度算法训练ANN网络，结果达到了很好的预测效果。</p>
+<p>Artificial neural networks, or ANN’s as they are commonly called, are used in many places throughout the world for a wide variety of applications. One of these applications is to predict results of sporting matches, and this is the section that my study was focused on. My study was concentrated directly on rugby league and basketball. By looking at the input and output data that has been entered by a user, the neural network looks at possible solutions as to how the output was achieved from the input. The ANN then tries to map these solutions to the other data points that have been entered, and checks to see how accurate it actually was. There are many different methods of training an ANN, however I focused mainly on the Backpropagation method and the Conjugate Gradient method. Training a neural network can be a very difficult task however, in this project, by taking care as to what data and methods that were used when training the network, good results were achieved.</p>
+<p><a href="https://www.researchgate.net/publication/220841301_Artificial_Intelligence_in_Sports_Prediction" target="_blank" rel="noopener">Artificial Intelligence in Sports Prediction</a>; Alan Mccabe, Jarrod Trevathan; 2008; ResearchGate<br>2008年， Alan Mccabe等人使用一个扩展的人工智能模型来做赛事预测，该模型由多层次的感知机组成，并且使用一些特征来代表每支球队。该系统在一些情况下预测结果超过了人工预测的结果。</p>
+<p>This paper presents an extension of earlier work in the use of artificial intelligence for prediction of sporting out- comes. An expanded model is described, as well as a broadening of the area of application of the original work. The model used is a form of multi-layer perceptron and it is presented with a number of features which attempt to capture the quality of various sporting teams. The system performs well and compares favourably with human tipsters in several environments. A study of less rigid “World Cup” formats appears, along with extensive live testing results in a major international tipping competition.</p>
+<p><a href="http://dl.acm.org/citation.cfm?id=1229658" target="_blank" rel="noopener">Data mining in sports: predicting Cy Young award winners</a>;      Lloyd Smith; 2007; ACM; Journal of Computing Sciences<br>2007年， Lloyd Smith使用贝叶斯分类器预测了美国青年杯棒球比赛，并且和其它两个统计模型进行比较，当没有候补投手的数据时，三个结果都比较低。</p>
+<p>A Bayesian classifier was created to predict Cy Young Award winners in American baseball. The model was compared against two statistical models designed to perform the same task. Over the years from 1967 through 2006, the accuracy of the Bayesian classifier was similar to that of the other two models—when restricted to starting pitchers, all three were more than 80% correct. Accuracy was lower for all three models when relief pitchers were included in the data.</p>
+<p><a href="http://dl.acm.org/citation.cfm?id=1565809" target="_blank" rel="noopener">Predicting cross-country results using feature selection and evolutionary computation</a>;     Caio Soares,     Juan E. Gilbert; 2009; ACM The Fifth Richard Tapia Celebration of Diversity in Computing Conference: Intellect, Initiatives, Insight, and Innovations  </p>
+<p>2009年， Juan E等人主要使用特征提取和进化计算来预测National Meet的比赛数据。特征提取使用来找出最优的特征集合，粒子群算法(Particle Swarm Optimizer)是用来找出最优的权重值集合。相比现有的系统，大概提高了0.3%。</p>
+<p>Although some work has been done to better predict the outcome of sporting events, it has focused on mainstream sports such as football and has typically employed forecasting or machine learning techniques. This work focuses on the sport of cross-country, and uses feature selection and evolutionary computation to better predict National Meet results. Feature Selection is utilized to find the most optimal feature set and a Particle Swarm Optimizer (PSO) to find the most optimal weight set. The best results are attained using the PSO, with an improvement over the current system of 2.5% for Women and 0.3% for Men.</p>
+<p><a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=5584399&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D5584399" target="_blank" rel="noopener">A fuzzy classification system for prediction of the results of the basketball games</a>; Krzysztof Trawinski; 2010; Fuzzy Systems (FUZZ), 2010 IEEE International Conference on  </p>
+<p>2010年， Krzysztof Trawinski通过构建模糊模型来预测比赛结果，其中选择了10条规则算法，并且和标准使用了KEEL系统的线性回归方法做了比较。使用特征提取算法和投票机制来选取最佳的特征。</p>
+<p>Prediction of the sports game results is an interesting topic that has gained attention lately. Mostly there are used stochastical methods of uncertainty description. In this work it is presented a preliminary approach to build a fuzzy model to basketball game results prediction. Ten fuzzy rule learning algorithms are selected, conducted and compared against standard linear regression with use of the KEEL system. Feature selection algorithms are applied and a majority voting is used in order to select the most representative features.</p>
+<p>Dynamic modelling and prediction of English Football League matches for betting; Martin Crowder, Mark Dixon, Anthony Ledford andMike Robinson; 2002; Journal of the Royal Statistical Society: Series D (The Statistician); Volume 51, Issue 2, pages 157–168, June 2002<br>2002年，Martin Crowder, Mark Dixon等人使用改进的狄克逊和科尔斯的独立泊松模型对英国的92个球队在1992年到1997年之间的比赛进行建模。通过关注主场胜，主场平，客场胜来预测两个球队之间的比赛结果。</p>
+<p>We focus on modelling the 92 soccer teams in the English Football Association League over the years 1992–1997 using refinements of the independent Poisson model of Dixon and Coles. Our framework assumes that each team has attack and defence strengths that evolve through time (rather than remaining constant) according to some unobserved bivariate stochastic process. Estimation of the teams’ attack and defence capabilities is undertaken via a novel approach involving an approximation that is computationally convenient and fast. The results of this approximation compare very favourably with results obtained through the Dixon and Coles approach. We note that the full model (i.e. the model before the above approximation is made) may be implemented using Markov chain Monte Carlo procedures, and that this approach is vastly more computationally expensive. We focus on the probabilities of home win, draw or away win because these outcomes constitute the primary betting market. These probabilities are estimated for games played between any two of the 92 teams and the predictions are compared with the actual results.</p>
+<h5 id="1-3-本文的研究内容"><a href="#1-3-本文的研究内容" class="headerlink" title="1.3 本文的研究内容"></a>1.3 本文的研究内容</h5><p>对NBA的篮球比赛胜负的预测，需要精确的描述每个球队的特征，除了使用来自球队的比赛统计数据作为基本特征外，本文还将使用基于TeamRank球队实力模型计算出来的球队之间相互的实力排名值作为特征之一。使用TeamRank值预测球队的实力排名。通过将每个球队历史的比赛记录及对手球队的数据作为一个序列标注问题，使用条件随机场对球队的比赛数据进行建模。通过建立的模型，对新的比赛进行胜负结果预测。</p>
+<p>本文研究的方法和成果将为篮球博彩领域提供一个有效的描述球队之间实力的模型，并且提供了对球队之间比赛结果预测分析的一种新的途径，提高了预测的正确率。</p>
+<h5 id="1-4-论文组织"><a href="#1-4-论文组织" class="headerlink" title="1.4 论文组织"></a>1.4 论文组织</h5><p>本文分为六章,整体组织结构如下:</p>
+<p>第一章是引言部分。说明了本文的研究背景及意义,分析了体育预测特别是篮球预测<br>的国内外研究现状,同时描述了本文的研究内容、方法并说明本文的组织结构。</p>
+<p>第二章，介绍了常规的篮球预测方法。解释了如何选取篮球比赛中球队的特征值，并提出球队实力模型TeamRank来准确描述球队之间的实力。</p>
+<p>第三章,基于马儿科夫场的条件随机场在篮球预测中的模型构造。根据有向图构造实力，并和其它基本特征一起构成输入的特征向量，使用条件随机场对数据构造模型。</p>
+<p>第四章,基于条件随机场模型的篮球预测框架与实验分析。 本章给出条件随机场模型系统的设计框架,并通过实验分析了算法的有效性与效率。</p>
+<p>第五章,总结与展望。总结全文,并展望后续工作的研究重心。</p>
+<h4 id="第二章-篮球预测方法"><a href="#第二章-篮球预测方法" class="headerlink" title="第二章 篮球预测方法"></a>第二章 篮球预测方法</h4><h5 id="2-1-球队的特征值"><a href="#2-1-球队的特征值" class="headerlink" title="2.1 球队的特征值"></a>2.1 球队的特征值</h5><p>在进行篮球赛事分析的时候，人们一般会采用如下的特征作为分析模型的输入（以下采用NBA官方网站给出的统计数据作为特征来源 ）：<br>Time, 当前比赛的时间。<br>Matchup, 当前比赛的对手球队。<br>HA， Home or Away，主场或者客场。<br>W/L， Win or Lose，当前赛事的结果，胜利或者失败。<br>MIN， Minutes，本场比赛所使用的时间。<br>PTS，Points，本场比赛所获得的总分数。<br>FGM，Field Goal Made，场内投篮成功次数。<br>FGA，Field Goal Attempt，场内投篮总次数。<br>FGP，Field Goal Percentage，场内投篮命中率。<br>3PM， 3 Points Field Goal Made，三分球场内投篮成功次数。<br>3PA， 3 Points Field Goal Attempt，三分球场内投篮总次数。<br>3PP， 3 Points Filed Goal Percentage，三分球场内投篮命中率。<br>FTM， Free Throws Made，场内罚球命中次数。<br>FTA， Free Throws Attempt，场内罚球总次数。<br>FTP， Free Throws Percentage，场内罚球命中率。<br>OREB，Offensive Rebounds，场内进攻篮板次数。<br>DREB，Deffensive Rebounds，场内防守篮板次数。<br>REB，Rebounds，场内篮板次数。<br>AST， Assists，场内助攻次数。<br>STL， Steals，场内抢断次数。<br>BLK， Blocks，场内拦网次数。<br>TOV， Turn Overs，场内反转次数。<br>PF， Personal Faults，场内失误总数。<br>相对于每场赛事球队总体的统计数据，对于球队的每个球员，也有一个相应的上述的统计数据。除了上述的统计数据，对于每个球员，还有个人的相关信息，如：年龄，球龄，身高，体重，球队角色。</p>
+<h5 id="2-2-TeamRank球队实力排名"><a href="#2-2-TeamRank球队实力排名" class="headerlink" title="2.2 TeamRank球队实力排名"></a>2.2 TeamRank球队实力排名</h5><p>为了准确使用数值描述各个球队的实力，这里我们通过基于有向图的PageRank方法来构造TeamRank，即给出每个球队的实力的数值表示。</p>
+<h6 id="2-2-1-PageRank简介"><a href="#2-2-1-PageRank简介" class="headerlink" title="2.2.1 PageRank简介"></a>2.2.1 PageRank简介</h6><p>PageRank，网页排名，是由谷歌公司的两位创始人Larry Page和Sergey Brin发明的，用它来体现网页的相关性和重要性。PageRank通过网络浩瀚的超链接关系来确定一个页面的等级。Google把从A页面到B页面的链接解释为A页面给B页面投票，Google根据投票来源（甚至来源的来源，即链接到A页面的页面）和投票目标的等级来决定新的等级。简单的说，一个高等级的页面可以使其他低等级页面的等级提升。<br>下面是经典的PageRank的计算公式：<br><img src="https://upload.wikimedia.org/math/5/6/f/56fb2d78dc8476d2700f6dd4454228db.png" alt="pagerank equation"><br><img src="https://upload.wikimedia.org/math/3/4/8/3485bceb55d7ff520d4b6ac08e1d7831.png" alt="pa">是被研究的页面, $M(P_i)$ 是链入 $P_i$页面的集合，$L(P_j)$ 是 $P_j$ 链出页面的数量，而N是所有页面的数量。</p>
+<h5 id="2-2-2-TeamRank"><a href="#2-2-2-TeamRank" class="headerlink" title="2.2.2 TeamRank"></a>2.2.2 TeamRank</h5><p>虽然NBA的官网统计数据给出了每支球队在每个地区每个时间段的排名数据，但是对于未相遇的球队之间的实力排名则没有形象的可靠的数据，例如对于东部赛区的球队和西部赛区的球队之间的实力情况就没有数据能形象的描述。所以这里我们需要一种方法或者模型能对所有的球队进行排名，以期望用一个数值来描述球队之间的实力排名情况。</p>
+<p>对于一个球队，或多或少都会与其它的球队进行比赛，若A队与B队比赛输了，表示A队向B队投了一票，否则是B向A投了一票。由此，对于所有的球队，会有一个相应的投票矩阵Votes如下：<br>$$<br>V_{n, n} =<br>\begin{pmatrix}<br>  v_{1,1} &amp; v_{1,2} &amp; \cdots &amp; v_{1,n} \<br>  v_{2,1} &amp; v_{2,2} &amp; \cdots &amp; v_{2,n} \<br>  \vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \<br>  v_{n,1} &amp; v_{n,2} &amp; \cdots &amp; v_{n,n}<br> \end{pmatrix}<br>$$<br>其中 $v_{n,m}$ 表示第n支球队对第m支球队的投票支持，矩阵中对角线上的元素全部为0,表示球队对自己不需要投票。</p>
+<p>对于矩阵中的每个元素，这里我们只使用胜负的数据来计算。例如A对B的投票值可以用B总共赢得A的次数除以A失败的总次数，可以使用如下公式进行计算：<br>$$v_{A, B} = \frac{Count(B-Beat-A)} {Count(A-Loses)}$$</p>
+<p>上述公式中 $Count(B-Beat-A)$ 表示B赢得A的次数， $Count(A-Loses)$ 表示A失败的总次数，所以矩阵中的每个元素都是小于或者等于1的，每行加起来和为1,表示一个球队对其它所有球队的总的贡献率为1。每列的和可能大于1,表示其它球队对当前球队的贡献率。</p>
+<p>这里我们假设球队的TeamRank向量为 $T = {t_1, t_2, …, t_n}$，其中 $t_i$ 表示第i支球队的TeamRank值。这里假设初始的TeamRank向量是随机化向量 $\hat{T} = {  $</p>
+<h4 id="第三章-球队实力模型"><a href="#第三章-球队实力模型" class="headerlink" title="第三章 球队实力模型"></a>第三章 球队实力模型</h4><h4 id="第四章-条件随机场"><a href="#第四章-条件随机场" class="headerlink" title="第四章 条件随机场"></a>第四章 条件随机场</h4><p>条件随机场(conditional random field, CRF)是给定一组输入随即变量的条件下，另一组输出随即变量的条件概率分布模型，其特点是假设输出随即变量构成马儿科夫随机场，条件随机场可以用于不同的预测问题，这里主要讲述线性链条件随机场，这时问题变成了由输入序列对输出序列预测的判别模型，形式为对数线性模型，其学习方法通常是极大似然估计。线性链条件随机场应用于标注问题是由Lafferty等人与2001年提出的。</p>
+<h5 id="4-1-概率无向图模型"><a href="#4-1-概率无向图模型" class="headerlink" title="4.1 概率无向图模型"></a>4.1 概率无向图模型</h5><p>概率无向图模型(probabilistic undirected graphical model)，又称为马儿科夫随机场(Markov random field)，是一个可以由无向图表示的联合概率分布。</p>
+<h6 id="4-1-1-模型定义"><a href="#4-1-1-模型定义" class="headerlink" title="4.1.1 模型定义"></a>4.1.1 模型定义</h6><p>图(Graph)是由结点(node)及链接结点的边(edge)组成的集合。结点和边分别记作v和e，结点和边的集合分别<br>记作V和E，图记作G=（V，E），无向图是指没有方向的图。</p>
+<p>概率图模型(probabilistic graphical model)是由图表示的概率分布。设有联合概率分布P(Y)，$Y \in y$ 是一组随机变量。由无向图G=(V, E)表示概率分布P(Y)，即在图G中，结点$v \in V$表示一个随机变量$Y_v$，$Y = (Y_v)_{v \in V}$；边$e \in E$表示随机变量之间的概率依赖关系。</p>
+<p>给定一个联合概率分布P(Y)和表示它的无向图G。首先定义无向图表示的随机变量之间存在的成对马儿科夫性(pairwise Markov property)，局部马儿科夫性(local Markov property)和全局马儿科夫性(global Markov property)。</p>
+<p>成对马儿科夫性：设u和v是无向图G中任意两个没有边链接的结点，结点u和v分别对应随机变量$Y_u$和$Y_v$。其他所有结点为O，对应随机变量组是$Y_o$。成对马儿科夫性是指给定随机变量组$Y_o$的条件下随机变量$Y_u$和$Y_v$是条件独立的，即：</p>
+<p>$P(Y_u, Y_v|Y_o)=P(Y_u|Y_o)P(Y_v|Y_o)$</p>
+<p>局部马儿科夫性：设$v \in V$是无向图G中任意一个结点，W是与v有边链接的所有结点，O是v，W以外的其他所有结点。v表示的随机变量是$Y_v$，W表示的随机变量组是$Y_w$，O表示的随机变量组是$Y_o$。局部马儿科夫性是指在给定随机变量组$Y_w$的条件下随机变量$Y_v$与随机变量组$Y_o$是独立的，即：</p>
+<p>$P(Y_v, Y_o|Y_w)=P(Y_v|Y_w)P(Y_o|Y_w)$</p>
+<p>在$P(Y_o|Y_w)$ &gt; 0时，等价地，</p>
+<p>$P(Y_v|Y_w) = P(Y_v|Y_w, Y_o)$</p>
+<p>下图表示由上述两个公式所示的局部马儿科夫性。</p>
+<p><img src="/img/local-markov-property.png" alt="local markov property"></p>
+<p>全局马儿科夫性：设结点集合A，B是在无向图G中被结点集合C分开的任意结点集合，如下图所示。结点集合A，B和C所对应的随即变量组分别是$Y_A$，$Y_B$，$Y_C$。全局马儿科夫性是指给定随机变量组$Y_C$条件下随即变量组$Y_A$和$Y_B$是条件独立的，即：<br>$P(Y_A, Y_B|Y_C)=P(Y_A|Y_C)P(Y_B|Y_C)$</p>
+<p><img src="/img/global-markov-property.png" alt="global-markov-property.png"></p>
+<p>上述成对的，局部的，全局的马儿科夫性定义是等价的。</p>
+<p>下面定义概率无向图模型。<br><strong>定义(概率无向图模型)</strong>  设有联合概率分布P(Y)，由无向图G=(V, E)表示，在图G中，结点表示随机变量，边表示随机变量之间的依赖关系。如果联合概率分布P(Y)满足成对，局部或全局马儿科夫性，就称此联合概率分布为概率无向图模型(probabilistic undirected graphical model)，或马儿科夫随机场(Markov random field)。<br>以上是概率无向图模型的定义，实际上，我们更关心的是如何求其联合概率分布。对给定的概率无向图模型，我们希望将整体的联合概率写成若干个子联合概率的乘积形势，也就是将联合概率进行因子分解，这样便于模型的学习和计算。事实上，概率无向图模型的最大特点就是易于因子分解。</p>
+<h6 id="4-1-2-概率无向图模型的因子分解"><a href="#4-1-2-概率无向图模型的因子分解" class="headerlink" title="4.1.2 概率无向图模型的因子分解"></a>4.1.2 概率无向图模型的因子分解</h6><p>首先给出无向图中团与最大团的定义。<br><strong>定义(团与最大团)</strong> 无向图G中任何两个结点均有边连接的结点子集成为团(clique)。若C是无向图G的一个团，并且不能再加进任何一个G的结点使其成为一个更大的团，则称此C为最大团(maximal clique)。<br>将概率无向图模型的联合概率分布表示为其上最大团的随机变量的函数的乘积形式的操作，称为概率无向图模型的因子分解(factorization)。<br>给定概率无向图模型，设其无向图为G，C为G上的最大团，$Y_C$表示C对应的随机变量。那么概率无向图模型的联合概率分布P(Y)可以写作途中所有最大团C上的函数<br>$\psi_C(Y_C)$<br>的乘积形式，即<br>$P(Y)=\frac{1}{Z} \prod \psi_C(Y_C)$<br>其中，Z是规范化因子(normalization factor)，由式<br>$Z=\sum_y\prod_c\psi_c(Y_c)$<br>给出。规范化因子保证P(Y)构成一个概率分布。函数<br>$\psi_C(Y_C)$<br>成为势函数(potential function)。这里要求势函数<br>$\psi_C(Y_C)$<br>是严格正的，通常定义为指数函数：</p>
+<p>$\psi_C(Y_C)=exp{-E(Y_C)}$</p>
+<p>概率无向图模型的因子分解由下述定理来保证。<br>** 定理(Hammersley-Clifford定理)** 概率无向图模型的联合概率分布P(Y)可以表示为如下的形式：</p>
+<p>$P(Y)=\frac{1}{Z}\prod_C\psi_C(Y_C)$<br>$Z=\sum_Y\prod_C\psi_C(Y_C)$</p>
+<p>其中，C是无向图的最大团，$Y_C$是C的结点对应的随机变量。<br>$\psi_C(Y_C)$<br>是C上定义的严格正函数，乘积是在无向图所有的最大团上进行的。</p>
+<h5 id="4-2-条件随机场的定义与形式"><a href="#4-2-条件随机场的定义与形式" class="headerlink" title="4.2 条件随机场的定义与形式"></a>4.2 条件随机场的定义与形式</h5><h6 id="4-2-1-条件随机场的定义"><a href="#4-2-1-条件随机场的定义" class="headerlink" title="4.2.1 条件随机场的定义"></a>4.2.1 条件随机场的定义</h6><p>条件随机场(conditional random field)是给定随机变量X条件下，随机变量Y的马儿科夫随机场。这里主要介绍定义在线性链上的特殊的条件随机场，称为线性链条件随机场(linear chain conditional random field)。线性链条件随机场可以用于标注等问题。这时，在条件概率模型P(Y|X)中，Y是输出变量，表示标记序列，X是输入变量，表示需要标注的观测序列。也把标记序列称为状态序列。学习时，利用训练数据集通过极大似然估计或正则化的极大似然估计得到条件概率模型<br>$\hat{P}(Y|X)$<br>；预测时，对于给定的输入序列x，求出条件概率<br>$\hat{P}P(y|x)$<br>最大的输出序列<br>$\hat{y}$</p>
+<p>首先定义一般的条件随机场，然后定义线性链条件随机场。<br><strong>定义(条件随机场)</strong> 设X与Y是随机变量，P(Y|X)是在给定X的条件下Y的条件概率分布。若随机变量Y构成一个由无向图G=(V, E)表示的马儿科夫随机场，即<br>$P(Y_v|X, Y_w, w \neq v) = P(Y_v|X, Y_w, w \sim v)$<br>对任意结点v成立，则称条件概率分布P(Y|X)为条件随机场。上述公式中<br>$w \sim v$<br>表示在图G=(V,E)中与结点v有边链接的所有结点w，<br>$w \neq v$<br>表示结点v以外的所有结点，$Y_v$，$Y_u$与$Y_w$为结点v, u与w对应的随机变量。  </p>
+<p>在定义中并没有要求X和Y具有相同的结构。现实中，一般假设X和Y有相同的图结构。本书主要考虑无向图为如下图所示的线性链的情况，即<br>$G=(V={1,2,…,n}, E={(i, i+1)}), i=1,2,…,n-1$<br>在此情况下，<br>$X=(X_1, X_2, …, X_n), Y=(Y_1, Y_2, …, Y_n)$,<br>最大团是相邻两个结点的集合。线性链条件随机场有下面的定义。<br><img src="/img/linearchainmarkovrandomfields.png" alt="linearchainmarkovrandomfields.png">  </p>
+<p><strong>定义(线性链条件随机场)</strong> 设$X=(X_1,X_2,…,X_n), Y=(Y_1, Y_2,…,Y_n)$均为线性链表示的随机变量序列，若在给定随机变量X的条件下，随机变量序列Y的条件概率分布P(Y|X)构成条件随机场，即满足马儿科夫性，则称P(Y|X)为线性链条件随机场。在标注问题中，X表示输入的观测序列，Y表示对应的输出标记序列或状态序列。</p>
+<h6 id="4-2-2-条件随机场的参数化形式"><a href="#4-2-2-条件随机场的参数化形式" class="headerlink" title="4.2.2 条件随机场的参数化形式"></a>4.2.2 条件随机场的参数化形式</h6><h6 id="4-2-3-条件随机场的简化形式"><a href="#4-2-3-条件随机场的简化形式" class="headerlink" title="4.2.3 条件随机场的简化形式"></a>4.2.3 条件随机场的简化形式</h6><h6 id="4-2-4-条件随机场的矩阵形式"><a href="#4-2-4-条件随机场的矩阵形式" class="headerlink" title="4.2.4 条件随机场的矩阵形式"></a>4.2.4 条件随机场的矩阵形式</h6><h5 id="4-3-条件随机场的概率计算问题"><a href="#4-3-条件随机场的概率计算问题" class="headerlink" title="4.3 条件随机场的概率计算问题"></a>4.3 条件随机场的概率计算问题</h5><h6 id="4-3-1-前向-后向算法"><a href="#4-3-1-前向-后向算法" class="headerlink" title="4.3.1 前向-后向算法"></a>4.3.1 前向-后向算法</h6><h6 id="4-3-2-概率计算"><a href="#4-3-2-概率计算" class="headerlink" title="4.3.2 概率计算"></a>4.3.2 概率计算</h6><h6 id="4-3-3-期望值计算"><a href="#4-3-3-期望值计算" class="headerlink" title="4.3.3 期望值计算"></a>4.3.3 期望值计算</h6><h5 id="4-4-条件随机场的学习算法"><a href="#4-4-条件随机场的学习算法" class="headerlink" title="4.4 条件随机场的学习算法"></a>4.4 条件随机场的学习算法</h5><h6 id="4-4-1-改进的迭代尺度法"><a href="#4-4-1-改进的迭代尺度法" class="headerlink" title="4.4.1 改进的迭代尺度法"></a>4.4.1 改进的迭代尺度法</h6><h6 id="4-4-2-拟牛顿法"><a href="#4-4-2-拟牛顿法" class="headerlink" title="4.4.2 拟牛顿法"></a>4.4.2 拟牛顿法</h6><h5 id="4-5-条件随机场的预测算法"><a href="#4-5-条件随机场的预测算法" class="headerlink" title="4.5 条件随机场的预测算法"></a>4.5 条件随机场的预测算法</h5><h4 id="第五章-实验分析预测"><a href="#第五章-实验分析预测" class="headerlink" title="第五章 实验分析预测"></a>第五章 实验分析预测</h4><h4 id="第六章-总结与展望"><a href="#第六章-总结与展望" class="headerlink" title="第六章 总结与展望"></a>第六章 总结与展望</h4><h4 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h4><h4 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h4><p>衷心地感谢导师程戈老师,当我面对科学的高峰望而生畏时,是他们孜孜不倦地给我以精神上的鼓励和学术上的启迪;当我埋头于书本执迷不悟时,是导师在明示我, “纸上得来终觉浅,绝知此事要躬行”;当我在实际工作中遇到困难时,是导师在引导我,“海纳百川有容乃大,壁立千仞无欲则刚”。两位导师严谨务实的治学态度深深地震撼了我,也使我更加明白做人做事都要脚踏实地,切忌眼高手低、纸上谈兵。这种追求真知的精神风貌将对我以后的工作与生活都会起到深远、积极的影响。</p>
+<p>衷心地感谢各位老师和各位同学,这匆忙的三年时间一路走来,在老师和同学们的监督和帮助下,使我树立了正确的世界观、人生观、价值观;三人行必有我师,在这种耳濡目染、言传身教的密切交流氛围中,我发现自己的缺点并一一改正,同时进一步发扬原来的优点,总体上性格更加成熟,思维更加开阔,意志更加坚定。一起度过的美好时光,许许多多共同的回忆,有你们才精彩。</p>
+<p>衷心地感谢我的家人,一直在背后默默地支持着我。不管我遇到怎样的困难,始终对我抱有坚定的信心,对我生活无微不至的关怀和照顾。</p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="undefined" data-title="" data-url="http://yoursite.com/GraduateThesis/条件随机场在篮球预测分析中的应用研究.html"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

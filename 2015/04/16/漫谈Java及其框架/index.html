@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>漫谈Java及其框架 | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="这几天因为要将视频点播直播的功能加入到体育局的项目中，所以必须与十分喜欢使用SSH框架的同事们协作。我会使用Java，例如视频转发功能的纯Java程序Rtsp2Rtmp就是我开发出来的，但是对于SSH框架，我就只算作了解了，我这里说的了解是指能跑个HelloWorld的程序而已或者稍微多点而已。">
+<meta name="keywords" content="Java,Framework,SSH">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漫谈Java及其框架">
+<meta property="og:url" content="http://yoursite.com/2015/04/16/漫谈Java及其框架/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="这几天因为要将视频点播直播的功能加入到体育局的项目中，所以必须与十分喜欢使用SSH框架的同事们协作。我会使用Java，例如视频转发功能的纯Java程序Rtsp2Rtmp就是我开发出来的，但是对于SSH框架，我就只算作了解了，我这里说的了解是指能跑个HelloWorld的程序而已或者稍微多点而已。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="漫谈Java及其框架">
+<meta name="twitter:description" content="这几天因为要将视频点播直播的功能加入到体育局的项目中，所以必须与十分喜欢使用SSH框架的同事们协作。我会使用Java，例如视频转发功能的纯Java程序Rtsp2Rtmp就是我开发出来的，但是对于SSH框架，我就只算作了解了，我这里说的了解是指能跑个HelloWorld的程序而已或者稍微多点而已。">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-漫谈Java及其框架" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/16/漫谈Java及其框架/" class="article-date">
+  	<time datetime="2015-04-16T11:11:08.000Z" itemprop="datePublished">2015-04-16</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      漫谈Java及其框架
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Framework/">Framework</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SSH/">SSH</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/Programming/">Programming</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>这几天因为要将视频点播直播的功能加入到体育局的项目中，所以必须与十分喜欢使用SSH框架的同事们协作。我会使用Java，例如视频转发功能的纯Java程序<a href="https://github.com/csrgxtu/Rtsp2Rtmp" target="_blank" rel="noopener">Rtsp2Rtmp</a>就是我开发出来的，但是对于SSH框架，我就只算作了解了，我这里说的了解是指能跑个HelloWorld的程序而已或者稍微多点而已。</p>
+<a id="more"></a>
+
+<p>读了前面的话，你已经可能知道了我的观点了。但是请不要给我定论。因为我一向对于这些问题保持开放的态度，实践出真知，哪个使我的活干的快，干的好，我就支持哪一个。</p>
+<h3 id="我的Java历史"><a href="#我的Java历史" class="headerlink" title="我的Java历史"></a>我的Java历史</h3><p>编程是我大学以后开始的，而Java第一次接触则是在大二的计算机课程中，由我们院的一个管理着据说很牛逼的集群的女老师授课。因为我们是数学院的计算科学专业，所以基本上是兼顾数学和计算机。直到老师上了一段时间的课程后，后知后觉的我才感觉到十分愤怒。为什么呢，因为这老师上课从不给我们演示程序是怎样书写的，只是照着网上下载下来的PPT课件宣读，顺便夹杂着讲她负责管理维护的集群有多牛逼。后来调查了她的履历以及所专注的事情，感觉要是突然要求这个老师写一个Java的HelloWorld程序，估计她还得上百度复制粘帖。就这经历我还没完，到大三的时候，她又继续带我们数据库，软件工程等计算机相关课程。哎，史书说明朝的内阁首府严嵩误国，而我觉得这老师在误人子弟。</p>
+<p>大学本科从大一结束开始，我就开始了纠结，思考着<strong>在中国的大学里究竟应该如何学习？</strong></p>
+<p>哦，因为从学校规定的课堂上，我感觉我就没有学到有用的东西，所以从大二后半期开始，我就不以课堂为正统，什么狗屁教学计划，大学的人才培养，老师点到，我不陪你们玩耍了。学习是自己的事，是一个主动过程，不是你刀架到我脖子上，我就能搞好。不信你看看建国以后辛辛苦苦扶植培养的民族工业。不信你看看百度之于谷歌，谁好谁坏，一用便知。</p>
+<p>既然Java课堂上就没有学会，那我就开始自己从图书馆借书，如《Java基础教程 基础版》，《Java基础教程 高阶版》《Java网络变成》等等，一本一本的看，实践理解书上的例子。使用Java写爬虫，如我的Project <a href="https://github.com/csrgxtu/Google" target="_blank" rel="noopener">Google</a>。</p>
+<p>本科的时候，Android刚刚兴起，好多人都学习Android平台下的编程，我也去了解了下，但不是很深入，写个测试某个功能的Android APP，我是没有问题的。</p>
+<p>后来到了研究生阶段，因为方向是数据处理，所以就使用Java作为一部分的处理语言。</p>
+<p>在本科的时候，指导我们的老师使用Java做事情，恩，应该主要是使用SSH做东西，但因为我是十分喜欢Linux平台下工作，感觉那一套与Linux的极简主义不符，也就没跟着倒是混的太深。他看了尚学堂的SSH开发系列视频，然后做了一个网站，后来就对其它老师说他非常精通SSH框架。后来我又了解到，因为大数据在中国火热，又因为他是数学老师，会点Java编程，就在导师介绍主页里面说大数据，数据挖掘，机器学习，人工智能，语音识别是他的研究领域。据了解，他每天忙着请客吃饭，申请论文，专利等一些能评职称的东西，真正没有在他所声称的研究领域投入资源精力。恩，我突然觉得以后千万不能相信没有经过自己验证的东西，人类的灵魂工程师尚且如此，令人大跌眼镜。</p>
+<p>高校的这种成长氛围，学术氛围，不停的打破着我的梦想。现实真的是如此的惨不忍睹。成长看起来毫无希望。</p>
+<p>于是乎，我顶着巨大的压力，去外面的公司实习。进入公司，参与到项目中，一个问题接着一个问题，层出不穷，从实践中迅速的成长着，做过后台开发，做过协议实现，做过路由器功能开发，做过大数据的搜索服务，管理服务器等等。之前出来的时候，老师说你们现在什么都不会，出去学不到什么东西，成长会很挫折。可是事实胜于一切。老师们觉得我们出来就是不好好学习，在外面浪迹，或者灯红酒绿。哎，我哪有资本灯红酒绿，再者说了，学生出来，不是出去整天嫖娼去了，里面学不到真东西，那就得去外面学习啊，再说，外面明显成长进步很快。</p>
+<p>因为公司的一个视频流技术设计两个协议之间的转发，所以先后使用Java和C语言实现了两遍。这就是我之前的Java经历。</p>
+<h3 id="从Java到框架"><a href="#从Java到框架" class="headerlink" title="从Java到框架"></a>从Java到框架</h3><p>如果你经常编程，那么你应该知道现在Java已经走到了8.0版本，从95年至今，不停的完善着Java的功能，使得现在的Java成为了一门无所不能的语言，从传统的软件编程，到WEB服务器，到数据处理方向，到嵌入式，到Android等等。因为NodeJs的异步概念，Java中也加入的异步的概念。哎，我这里例举不完。</p>
+<p>一个人在成长的过程中，也渐渐的老去。Java因为不断的完善而慢慢变的臃肿。所以人们开始转移视线了，如偏向动态语言的Python，NodeJs等。但是Java依然庞大，所以折中的办法是后续的基于JVM的Groovy，Scala，Clojure等等。</p>
+<p>还有就是Java的各种框架，struts， spring， hibenate， JSF， play，等等不胜枚举。</p>
+<p>这么多的选择，这不是Java的错，关键是我们要能合理做出选择。在做体育局的项目中，发现他们效率极低，这个东西要是让我使用NodeJs，感觉能飞快的实现出来。例如，为了实现一个接口，我得写一个Action class, 然后到数据库层里实现Interface等等，最后整出来的URL接口还是个这<em><a href="http://localhost:8080/SportEx/camer/updateVideoRecord.action?parameterConditions.ID=11111&amp;parameterConditions.DTIME=%22321313131%22" target="_blank" rel="noopener">http://localhost:8080/SportEx/camer/updateVideoRecord.action?parameterConditions.ID=11111&amp;parameterConditions.DTIME=%22321313131%22</a></em>，这东西看起来就不简洁。</p>
+<p>SSH框架是好东西，但它有它的适用环境，小小一个体育局项目，貌似衣服有点大。</p>
+<p>哦，《黑客与画家》的作者说一个语言要是不简洁，对使用者不友好，那么它就最终要消亡。我估计Java在走向这个方向。例如，打开个文件，需要用StreamInput, BufferReadered， IOException等一系列东西，创建一个socket链接还要使用stream, buffer, exceptions等概念。为了读取一个文件，我的HelloWorld程序写了一页纸。</p>
+<p>因为我自己的Project的需求，经过一番调查，决定选取Java 框架<a href="http://www.ninjaframework.org/" target="_blank" rel="noopener">Ninja</a>, 一个轻量快速简单的MVC框架。且是RESTful API格式的。</p>
+<h3 id="Coworkers"><a href="#Coworkers" class="headerlink" title="Coworkers"></a>Coworkers</h3><p>再讲一起共事的人。作为程序员，一定要思维开阔，不能局限。不能因为自己大学毕业后去了培训机构培训了SSH框架，以后所做的每件事情都用SSH。要博览群书，时刻观察新技术，注意技术界的动态。</p>
+<p>我是因为在视频功能集成的过程中，发现与他们交流，半天反应不上来，战前顾后，左右考虑为难，一个功能老久才能做出来。这种团队必须得逃离。</p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/04/24/A-little-thing-about-RESTful-API/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          A little thing about RESTful API
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/14/CORS-跨域资源共享/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CORS 跨域资源共享</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="漫谈Java及其框架" data-title="漫谈Java及其框架" data-url="http://yoursite.com/2015/04/16/漫谈Java及其框架/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>WSGI 服务器性能分析【译】 | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="突然看到Omed Habib的文章：A performance analysis of Python wsgi servers，觉得Bjoern确实可以用在我们项目中，用来替代现有Gunicorn。因此将原文翻译至此，希望更多可以帮助更多人。btw，Bjoern是一个用C和Libuv实现的轻量化WSGI服务器，各方面评测目前基本都处于领先的位置。">
+<meta name="keywords" content="Python,Web Server,WSGI,Performance">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WSGI 服务器性能分析【译】">
+<meta property="og:url" content="http://yoursite.com/2020/03/08/WSGI-服务器性能分析/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="突然看到Omed Habib的文章：A performance analysis of Python wsgi servers，觉得Bjoern确实可以用在我们项目中，用来替代现有Gunicorn。因此将原文翻译至此，希望更多可以帮助更多人。btw，Bjoern是一个用C和Libuv实现的轻量化WSGI服务器，各方面评测目前基本都处于领先的位置。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_qps.png">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_qps_bjoern_hidden.png">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_latency.png">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_mem.png">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_error.png">
+<meta property="og:image" content="http://yoursite.com/img/wsgi_cpu_usage.png">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WSGI 服务器性能分析【译】">
+<meta name="twitter:description" content="突然看到Omed Habib的文章：A performance analysis of Python wsgi servers，觉得Bjoern确实可以用在我们项目中，用来替代现有Gunicorn。因此将原文翻译至此，希望更多可以帮助更多人。btw，Bjoern是一个用C和Libuv实现的轻量化WSGI服务器，各方面评测目前基本都处于领先的位置。">
+<meta name="twitter:image" content="http://yoursite.com/img/wsgi_qps.png">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-WSGI-服务器性能分析" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/03/08/WSGI-服务器性能分析/" class="article-date">
+  	<time datetime="2020-03-08T11:36:07.000Z" itemprop="datePublished">2020-03-08</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      WSGI 服务器性能分析【译】
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Performance/">Performance</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WSGI/">WSGI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web-Server/">Web Server</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>突然看到Omed Habib的文章：<a href="https://www.appdynamics.com/blog/engineering/a-performance-analysis-of-python-wsgi-servers-part-2/" target="_blank" rel="noopener">A performance analysis of Python wsgi servers</a>，觉得Bjoern确实可以用在我们项目中，用来替代现有Gunicorn。因此将原文翻译至此，希望更多可以帮助更多人。btw，Bjoern是一个用C和Libuv实现的轻量化WSGI服务器，各方面评测目前基本都处于领先的位置。</p>
+<a id="more"></a>
+<p>在这个系列的第一篇文章中，我介绍了6款比较出名的WSGI Server。在本篇中，我会通过构建benchmark测试集来评测这6款server。  </p>
+<h3 id="CGI和mod-pyton"><a href="#CGI和mod-pyton" class="headerlink" title="CGI和mod_pyton"></a>CGI和mod_pyton</h3><p>在WSGI标准化以前，CGI和mod_python就已经存在了。CGI是通过对每个请求创建一个新的Py进程来处理链接，因此比较低效。 mod_python相对于CGI，性能有提升，但是只能和Apache Http server 集成，况且目前处于inactive devolop的状态。</p>
+<h3 id="WSGI-Servers"><a href="#WSGI-Servers" class="headerlink" title="WSGI Servers"></a>WSGI Servers</h3><p>因为时间关系，我们将重点关注下面的Wsgi server。所有的测试代码都已经发布在 <a href="https://github.com/omedhabib/WSGI_Benchmarks" target="_blank" rel="noopener">github</a>，且我们将会后期更新它。</p>
+<ul>
+<li>Bojern 的官方文档描述其为“非常快的Python WSGI Server” 并且它是“最快的，最小的，最轻量化的”。我们使用默认的配置创建了一个<a href="https://gist.github.com/omedhabib/c3c8ff74ec3993740e80d7235251e73a" target="_blank" rel="noopener">app</a> 来测试它。</li>
+<li>CherryPy 是一个WSGI server和app frawork的实现。</li>
+<li>Gunicorn 理念来自Ruby世界的Unicorn。其官方文档描述为“实现简单，轻量”。和前两者不同的是，Gunicorn是一个独立启动的server。</li>
+<li>Meinheld 称其为“高性能的WSGI兼容web服务器”。根据官方文档，我们创建了这个<a href="https://gist.github.com/omedhabib/d638e213af0f843580e5ca7724005ac6" target="_blank" rel="noopener">测试程序</a></li>
+<li>mod_wsgi 和mod_python 一样来自同一个作者，且只能和apache http server搭配工作。</li>
+<li>uWSGI 是一个功能齐全的WSGI server。同样的根据默认配置我们建立了相应的测试程序。</li>
+</ul>
+<h3 id="压测"><a href="#压测" class="headerlink" title="压测"></a>压测</h3><p>我们使用Docker来跑每个benchmark，这样可以环境隔离，每个测试启动的到时候都是干净的环境，不受当前sys的影响。</p>
+<h4 id="服务器"><a href="#服务器" class="headerlink" title="服务器"></a>服务器</h4><ul>
+<li>独立的Docker 容器</li>
+<li>2 CPU</li>
+<li>512 RAM</li>
+</ul>
+<h4 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h4><ul>
+<li>wrk, 一个现代化的HTTP压测工具</li>
+<li>使用在100到10000之间的并发量随机测试一个服务</li>
+<li>wrk 限制使用2个system cpu</li>
+<li>每个测试跑30秒且重复4遍</li>
+</ul>
+<h4 id="性能数据"><a href="#性能数据" class="headerlink" title="性能数据"></a>性能数据</h4><ul>
+<li>wrk提供的请求数量、错误、延迟</li>
+<li>Docker stat工具提供的CPU、mem使用情况</li>
+<li>去掉两边的极值然后取平均</li>
+<li>请参考：<a href="https://github.com/omedhabib/WSGI_Benchmarks/blob/master/benchmark.sh" target="_blank" rel="noopener">script</a></li>
+</ul>
+<h4 id="结果数据"><a href="#结果数据" class="headerlink" title="结果数据"></a>结果数据</h4><p>所有的评测数据都放在项目github目录下的summary csv文件。如果你感兴趣可以将其导入图形化工具来分析。</p>
+<h3 id="QPS"><a href="#QPS" class="headerlink" title="QPS"></a>QPS</h3><p>下图展示了6款server的QPS情况，数据越大越好。<br><img src="/img/wsgi_qps.png" alt="request served"></p>
+<p><img src="/img/wsgi_qps_bjoern_hidden.png" alt="request served bojern hidden"></p>
+<ul>
+<li>Bojern 是明显的胜出者</li>
+<li>CherryPy尽管用纯Python实现，但是其性能相当不错</li>
+<li>Meinheld也可以</li>
+<li>mod_wsgi 性能稳定，但是并没有那么出色</li>
+<li>Gunicorn 随着并发量增大qps下降</li>
+<li>uWSGI表现垫底<br>胜出者：Bojern</li>
+</ul>
+<h3 id="延迟"><a href="#延迟" class="headerlink" title="延迟"></a>延迟</h3><p>延迟就是从请求发出到响应收到这段时间，越短越好。<br><img src="/img/wsgi_latency.png" alt="wsgi_latency"></p>
+<ul>
+<li>CherryPy 在并发量持续增长的情况下表现稳定，基本低于3毫秒</li>
+<li>Bjoern延迟比较大，但是在并发量低的情况下延迟较小</li>
+<li>Gunicorn 延迟一直稳定</li>
+<li>mod_wsgi 处于平均水平</li>
+<li>Meinheld 和Bjoern一样，当并发量增大，延迟增大</li>
+<li>uWSGI 最后一名<br>胜出者：CherryPy<br>Note: Bjoern is the second</li>
+</ul>
+<h3 id="内存使用情况"><a href="#内存使用情况" class="headerlink" title="内存使用情况"></a>内存使用情况</h3><p>这里考察每种服务器使用内存情况，当然是越低越好。<br><img src="/img/wsgi_mem.png" alt="wsgi_mem"></p>
+<ul>
+<li>Bjoern 内存占用最少，即使是10000的并发也只占用了9M</li>
+<li>Meinheld 和Bjoern基本相似</li>
+<li>Gunicorn 在增大并发量的情况下，内存占用稳定</li>
+<li>CherryPy 会随着并发增加占用变大</li>
+<li>mod_wsgi 表现稳定</li>
+<li>uWSGI 又是占用资源最多的<br>胜出者： Bjoern and Beinheld</li>
+</ul>
+<h3 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h3><p>这里给出Web server丢弃，断开或者超时链接的情况。<br><img src="/img/wsgi_error.png" alt="wsgi_error"></p>
+<ul>
+<li>CherryPy 基本上零错误</li>
+<li>Bjoern 有遇到error，但是其qps高很多</li>
+<li>mod_wsgi 大概有6%的错误率</li>
+<li>Gunicorn 在高并发的情况下，错误率大概9%</li>
+<li>uWSGI 大概34%的错误率</li>
+<li>Meinheld 错误率比较高<br>胜出者： CherryPy</li>
+</ul>
+<h3 id="CPU使用情况"><a href="#CPU使用情况" class="headerlink" title="CPU使用情况"></a>CPU使用情况</h3><p>CPU使用率高不是坏事也不是好事，前提是提供服务稳定就好。但是在相同的情况下，使用率月底表现越好。</p>
+<p><img src="/img/wsgi_cpu_usage.png" alt="wsgi_cpu_usage"></p>
+<ul>
+<li>Bjoern 是单线程的，其实用率100%</li>
+<li>CherryPy 是多线程，但是因为GIL，其实用率基本150%</li>
+<li>Gunicorn 是多进程，占用率在150%以上</li>
+<li>Meinheld 和Gjoern差不多</li>
+<li>mod_wsgi 真正的多线程，所以基本跑满了CPU</li>
+<li>uWSGI 使用率较低<br>胜出者： None，因为模式不一样，无法比较</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>根据压测结果，我们得出结论:Bjoern性能优异，uWSGI表现最差。</p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/22/Let-s-build-a-WSGI-server/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Let&#39;s build a WSGI server
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/02/24/Redis-internal-101/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Redis internal 101 --[Draft]</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="WSGI-服务器性能分析" data-title="WSGI 服务器性能分析【译】" data-url="http://yoursite.com/2020/03/08/WSGI-服务器性能分析/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

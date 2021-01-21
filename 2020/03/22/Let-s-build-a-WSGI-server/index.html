@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Let&#39;s build a WSGI server | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Let’s build a wsgi server ground up with sockets, multi-processing or Select/Poll/Epoll. to achive this, you need familiar with Python’s socket programming, Python’s cucurreny model, Linux Non-blockin">
+<meta name="keywords" content="Python,Concurrency,WSGI,Select">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Let&#39;s build a WSGI server">
+<meta property="og:url" content="http://yoursite.com/2020/03/22/Let-s-build-a-WSGI-server/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="Let’s build a wsgi server ground up with sockets, multi-processing or Select/Poll/Epoll. to achive this, you need familiar with Python’s socket programming, Python’s cucurreny model, Linux Non-blockin">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Let&#39;s build a WSGI server">
+<meta name="twitter:description" content="Let’s build a wsgi server ground up with sockets, multi-processing or Select/Poll/Epoll. to achive this, you need familiar with Python’s socket programming, Python’s cucurreny model, Linux Non-blockin">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Let-s-build-a-WSGI-server" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/03/22/Let-s-build-a-WSGI-server/" class="article-date">
+  	<time datetime="2020-03-22T11:58:34.000Z" itemprop="datePublished">2020-03-22</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Let&#39;s build a WSGI server
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Concurrency/">Concurrency</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Select/">Select</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WSGI/">WSGI</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Let’s build a wsgi server ground up with sockets, multi-processing or Select/Poll/Epoll. to achive this, you need familiar with Python’s socket programming, Python’s cucurreny model, Linux Non-blocking I/O.</p>
+<a id="more"></a>
+
+<p>WSGI(web server gateway interface) is a protocol in Python web programming, it defines how web application and web server communicate. with this protocol, you can chose various combinations about web servers and web frameworks which are wsgi-compatiable. for example, you can use Gunicorn + Django, or even Bjoern + Flask etc…</p>
+<h3 id="What’s-WSGI-Server"><a href="#What’s-WSGI-Server" class="headerlink" title="What’s WSGI Server"></a>What’s WSGI Server</h3><p>WSGI server is the server side wsgi protocol implementation. which is responsible accepting connections and invoke web application to process the result though wsgi protocol, and finally return the result back to clients. with wsgi server concentrate on accepting connections, wsgi framework(application) can focus on your bussiness logic.   </p>
+<p>To summarize, as an wsgi server, it must contains following info:</p>
+<ul>
+<li><p>compose <code>env</code> variables which will be used in web framework</p>
+  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">environ[<span class="string">'wsgi.input'</span>]        = sys.stdin</span><br><span class="line">environ[<span class="string">'wsgi.errors'</span>]       = sys.stderr</span><br><span class="line">environ[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">environ[<span class="string">'wsgi.multithread'</span>]  = <span class="literal">False</span></span><br><span class="line">environ[<span class="string">'wsgi.multiprocess'</span>] = <span class="literal">True</span></span><br><span class="line">environ[<span class="string">'wsgi.run_once'</span>]     = <span class="literal">True</span></span><br><span class="line">environ[<span class="string">'wsgi.url_schema'</span>]   = <span class="string">'http'</span></span><br><span class="line">environ[<span class="string">'REQUEST_METHOD'</span>]    = <span class="string">'GET'</span></span><br><span class="line">environ[<span class="string">'PATH_INFO'</span>]         = <span class="string">'/hello'</span></span><br><span class="line">environ[<span class="string">'SERVER_NAME'</span>]       = <span class="string">'localhost'</span></span><br><span class="line">environ[<span class="string">'SERVER_PORT'</span>]       = <span class="number">8888</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>start_response callable which will be called in web framework</p>
+  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, response_header, exec_info=None)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    status is the http status code, response_header is the header web framework wants to added</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>for more detail, please reference: <a href="https://www.python.org/dev/peps/pep-0333/#implementation-application-notes" target="_blank" rel="noopener">PEP 333: Python web server gateway interfaces v1.0</a></p>
+<h3 id="Simple-TCP-echo-server"><a href="#Simple-TCP-echo-server" class="headerlink" title="Simple TCP echo server"></a>Simple TCP echo server</h3><p>As classic socket programming said, a socket server needs to bind/listen/accept/recv/send/close, a socket client needs to connect/send/recv/close. here is a simple example:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleTcpServer</span><span class="params">(object)</span>:</span></span><br><span class="line">    address_family = socket.AF_INET</span><br><span class="line">    socket_type = socket.SOCK_STREAM</span><br><span class="line">    request_queue_size = <span class="number">1024</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init</span><span class="params">(self, server_address)</span>:</span></span><br><span class="line">        <span class="comment"># Create a listening socket</span></span><br><span class="line">        self.listen_socket = listen_socket = socket.socket(</span><br><span class="line">            self.address_family,</span><br><span class="line">            self.socket_type</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># Allow to reuse the same address</span></span><br><span class="line">        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># Bind</span></span><br><span class="line">        listen_socket.bind(server_address)</span><br><span class="line">        <span class="comment"># Activate</span></span><br><span class="line">        listen_socket.listen(self.request_queue_size)</span><br><span class="line">        <span class="comment"># Get server host name and port</span></span><br><span class="line">        host, port = self.listen_socket.getsockname()[:<span class="number">2</span>]</span><br><span class="line">        self.server_name = socket.getfqdn(host)</span><br><span class="line">        self.server_port = port</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">server_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            self.client_connection, client_address = self.listen_socket.accept()</span><br><span class="line">            self.handle_one_request()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_one_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        request_data = self.client_connection.recv(<span class="number">1024</span>)</span><br><span class="line">        self.client_connection.sendall(request_data)</span><br><span class="line">        self.client_connection.close()</span><br></pre></td></tr></table></figure>
+
+<h3 id="A-simple-wsgi-server"><a href="#A-simple-wsgi-server" class="headerlink" title="A simple wsgi server"></a>A simple wsgi server</h3><p>The simple wsgi server will listen on port, waitting for incoming connection to accept, for each connection, wsgi server will invoke web framework process(which is the main entrance implemented in web framework) the request and wait until web framework finish processing it and return the result to client. here is a simple example:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> io</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIServer</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    address_family = socket.AF_INET</span><br><span class="line">    socket_type = socket.SOCK_STREAM</span><br><span class="line">    request_queue_size = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address)</span>:</span></span><br><span class="line">        <span class="comment"># Create a listening socket</span></span><br><span class="line">        self.listen_socket = listen_socket = socket.socket(</span><br><span class="line">            self.address_family,</span><br><span class="line">            self.socket_type</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># Allow to reuse the same address</span></span><br><span class="line">        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># Bind</span></span><br><span class="line">        listen_socket.bind(server_address)</span><br><span class="line">        <span class="comment"># Activate</span></span><br><span class="line">        listen_socket.listen(self.request_queue_size)</span><br><span class="line">        <span class="comment"># Get server host name and port</span></span><br><span class="line">        host, port = self.listen_socket.getsockname()[:<span class="number">2</span>]</span><br><span class="line">        self.server_name = socket.getfqdn(host)</span><br><span class="line">        self.server_port = port</span><br><span class="line">        <span class="comment"># Return headers set by Web framework/Web application</span></span><br><span class="line">        self.headers_set = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_app</span><span class="params">(self, application)</span>:</span></span><br><span class="line">        self.application = application</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        listen_socket = self.listen_socket</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="comment"># New client connection</span></span><br><span class="line">            self.client_connection, client_address = listen_socket.accept()</span><br><span class="line">            <span class="comment"># Handle one request and close the client connection. Then</span></span><br><span class="line">            <span class="comment"># loop over to wait for another client connection</span></span><br><span class="line">            self.handle_one_request()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_one_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        request_data = self.client_connection.recv(<span class="number">1024</span>)</span><br><span class="line">        self.request_data = request_data = request_data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="comment"># Print formatted request data a la 'curl -v'</span></span><br><span class="line">        print(<span class="string">''</span>.join(</span><br><span class="line">            <span class="string">f'&lt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> request_data.splitlines()</span><br><span class="line">        ))</span><br><span class="line"></span><br><span class="line">        self.parse_request(request_data)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Construct environment dictionary using request data</span></span><br><span class="line">        env = self.get_environ()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># It's time to call our application callable and get</span></span><br><span class="line">        <span class="comment"># back a result that will become HTTP response body</span></span><br><span class="line">        result = self.application(env, self.start_response)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Construct a response and send it back to the client</span></span><br><span class="line">        self.finish_response(result)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_request</span><span class="params">(self, text)</span>:</span></span><br><span class="line">        request_line = text.splitlines()[<span class="number">0</span>]</span><br><span class="line">        request_line = request_line.rstrip(<span class="string">'\r\n'</span>)</span><br><span class="line">        <span class="comment"># Break down the request line into components</span></span><br><span class="line">        (self.request_method,  <span class="comment"># GET</span></span><br><span class="line">         self.path,            <span class="comment"># /hello</span></span><br><span class="line">         self.request_version  <span class="comment"># HTTP/1.1</span></span><br><span class="line">         ) = request_line.split()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_environ</span><span class="params">(self)</span>:</span></span><br><span class="line">        env = &#123;&#125;</span><br><span class="line">        <span class="comment"># The following code snippet does not follow PEP8 conventions</span></span><br><span class="line">        <span class="comment"># but it's formatted the way it is for demonstration purposes</span></span><br><span class="line">        <span class="comment"># to emphasize the required variables and their values</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># Required WSGI variables</span></span><br><span class="line">        env[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">        env[<span class="string">'wsgi.url_scheme'</span>]   = <span class="string">'http'</span></span><br><span class="line">        env[<span class="string">'wsgi.input'</span>]        = io.StringIO(self.request_data)</span><br><span class="line">        env[<span class="string">'wsgi.errors'</span>]       = sys.stderr</span><br><span class="line">        env[<span class="string">'wsgi.multithread'</span>]  = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.multiprocess'</span>] = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.run_once'</span>]     = <span class="literal">False</span></span><br><span class="line">        <span class="comment"># Required CGI variables</span></span><br><span class="line">        env[<span class="string">'REQUEST_METHOD'</span>]    = self.request_method    <span class="comment"># GET</span></span><br><span class="line">        env[<span class="string">'PATH_INFO'</span>]         = self.path              <span class="comment"># /hello</span></span><br><span class="line">        env[<span class="string">'SERVER_NAME'</span>]       = self.server_name       <span class="comment"># localhost</span></span><br><span class="line">        env[<span class="string">'SERVER_PORT'</span>]       = str(self.server_port)  <span class="comment"># 8888</span></span><br><span class="line">        <span class="keyword">return</span> env</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(self, status, response_headers, exc_info=None)</span>:</span></span><br><span class="line">        <span class="comment"># Add necessary server headers</span></span><br><span class="line">        server_headers = [</span><br><span class="line">            (<span class="string">'Date'</span>, <span class="string">'Mon, 15 Jul 2019 5:54:48 GMT'</span>),</span><br><span class="line">            (<span class="string">'Server'</span>, <span class="string">'WSGIServer 0.2'</span>),</span><br><span class="line">        ]</span><br><span class="line">        self.headers_set = [status, response_headers + server_headers]</span><br><span class="line">        <span class="comment"># To adhere to WSGI specification the start_response must return</span></span><br><span class="line">        <span class="comment"># a 'write' callable. We simplicity's sake we'll ignore that detail</span></span><br><span class="line">        <span class="comment"># for now.</span></span><br><span class="line">        <span class="comment"># return self.finish_response</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">finish_response</span><span class="params">(self, result)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            status, response_headers = self.headers_set</span><br><span class="line">            response = <span class="string">f'HTTP/1.1 <span class="subst">&#123;status&#125;</span>\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> header <span class="keyword">in</span> response_headers:</span><br><span class="line">                response += <span class="string">'&#123;0&#125;: &#123;1&#125;\r\n'</span>.format(*header)</span><br><span class="line">            response += <span class="string">'\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> data <span class="keyword">in</span> result:</span><br><span class="line">                response += data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">            <span class="comment"># Print formatted response data a la 'curl -v'</span></span><br><span class="line">            print(<span class="string">''</span>.join(</span><br><span class="line">                <span class="string">f'&gt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> response.splitlines()</span><br><span class="line">            ))</span><br><span class="line">            response_bytes = response.encode()</span><br><span class="line">            self.client_connection.sendall(response_bytes)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.client_connection.close()</span><br></pre></td></tr></table></figure>
+
+<h3 id="Concurrent-with-multi-processing"><a href="#Concurrent-with-multi-processing" class="headerlink" title="Concurrent with multi-processing"></a>Concurrent with multi-processing</h3><p>The upper wsgi server can process a request at a time, cuz it is a single process and will block in while loop, as following code shows:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">    listen_socket = self.listen_socket</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="comment"># New client connection</span></span><br><span class="line">        self.client_connection, client_address = listen_socket.accept()</span><br><span class="line">        <span class="comment"># Handle one request and close the client connection. Then</span></span><br><span class="line">        <span class="comment"># loop over to wait for another client connection</span></span><br><span class="line">        self.handle_one_request()</span><br></pre></td></tr></table></figure>
+
+<p><code>handle_one_request</code> will block the while loop while processing the current connection. the time spend on blocking depends on your web application’s corresonding method’s processing speed.  </p>
+<p>if the first connection didn’t finished, the second connection will be blocked by the first one. how can we let the wsgi server handle multiple connections at the same time? the answer is multi-processing.  </p>
+<p>here is an example of multi-processing version, which will fork an new python process for each incoming connections.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIServer</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    address_family = socket.AF_INET</span><br><span class="line">    socket_type = socket.SOCK_STREAM</span><br><span class="line">    request_queue_size = <span class="number">1024</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address)</span>:</span></span><br><span class="line">        <span class="comment"># Create a listening socket</span></span><br><span class="line">        self.listen_socket = listen_socket = socket.socket(</span><br><span class="line">            self.address_family,</span><br><span class="line">            self.socket_type</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># Allow to reuse the same address</span></span><br><span class="line">        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># Bind</span></span><br><span class="line">        listen_socket.bind(server_address)</span><br><span class="line">        <span class="comment"># Activate</span></span><br><span class="line">        listen_socket.listen(self.request_queue_size)</span><br><span class="line">        <span class="comment"># Get server host name and port</span></span><br><span class="line">        host, port = self.listen_socket.getsockname()[:<span class="number">2</span>]</span><br><span class="line">        self.server_name = socket.getfqdn(host)</span><br><span class="line">        self.server_port = port</span><br><span class="line">        <span class="comment"># Return headers set by Web framework/Web application</span></span><br><span class="line">        self.headers_set = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__reap_children</span><span class="params">(selflili, signum, frame)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        collect zombie children</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                <span class="comment"># wait for all children, do not block</span></span><br><span class="line">                pid, status = os.waitpid(<span class="number">-1</span>, os.WNOHANG)</span><br><span class="line">                <span class="keyword">if</span> pid == <span class="number">0</span>:  <span class="comment"># no more zombies</span></span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">                <span class="comment"># usally this would be OSError exception</span></span><br><span class="line">                <span class="comment"># with errno attribute set to errno.ECHILD</span></span><br><span class="line">                <span class="comment"># which means there are no more children</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_app</span><span class="params">(self, application)</span>:</span></span><br><span class="line">        self.application = application</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        signal.signal(signal.SIGCHLD, self.__reap_children)</span><br><span class="line">        listen_socket = self.listen_socket</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="comment"># New client connection</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                self.client_connection, client_address = listen_socket.accept()</span><br><span class="line">            <span class="keyword">except</span> IOError <span class="keyword">as</span> e:</span><br><span class="line">                code, msg = e.args</span><br><span class="line">                <span class="keyword">if</span> code == errno.EINR:</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">raise</span></span><br><span class="line">            pid = os.fork()</span><br><span class="line">            <span class="keyword">if</span> pid == <span class="number">0</span>:  <span class="comment"># child</span></span><br><span class="line">                self.listen_socket.close()</span><br><span class="line">                self.handle_one_request()</span><br><span class="line">                os._exit(<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">else</span>:  <span class="comment"># parent</span></span><br><span class="line">                self.client_connection.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_one_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        request_data = self.client_connection.recv(<span class="number">1024</span>)</span><br><span class="line">        self.request_data = request_data = request_data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="comment"># Print formatted request data a la 'curl -v'</span></span><br><span class="line">        print(<span class="string">''</span>.join(</span><br><span class="line">            <span class="string">f'&lt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> request_data.splitlines()</span><br><span class="line">        ))</span><br><span class="line"></span><br><span class="line">        self.parse_request(request_data)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Construct environment dictionary using request data</span></span><br><span class="line">        env = self.get_environ()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># It's time to call our application callable and get</span></span><br><span class="line">        <span class="comment"># back a result that will become HTTP response body</span></span><br><span class="line">        result = self.application(env, self.start_response)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Construct a response and send it back to the client</span></span><br><span class="line">        self.finish_response(result)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_request</span><span class="params">(self, text)</span>:</span></span><br><span class="line">        request_line = text.splitlines()[<span class="number">0</span>]</span><br><span class="line">        request_line = request_line.rstrip(<span class="string">'\r\n'</span>)</span><br><span class="line">        <span class="comment"># Break down the request line into components</span></span><br><span class="line">        (self.request_method,  <span class="comment"># GET</span></span><br><span class="line">         self.path,            <span class="comment"># /hello</span></span><br><span class="line">         self.request_version  <span class="comment"># HTTP/1.1</span></span><br><span class="line">         ) = request_line.split()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_environ</span><span class="params">(self)</span>:</span></span><br><span class="line">        env = &#123;&#125;</span><br><span class="line">        <span class="comment"># The following code snippet does not follow PEP8 conventions</span></span><br><span class="line">        <span class="comment"># but it's formatted the way it is for demonstration purposes</span></span><br><span class="line">        <span class="comment"># to emphasize the required variables and their values</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># Required WSGI variables</span></span><br><span class="line">        env[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">        env[<span class="string">'wsgi.url_scheme'</span>]   = <span class="string">'http'</span></span><br><span class="line">        env[<span class="string">'wsgi.input'</span>]        = io.StringIO(self.request_data)</span><br><span class="line">        env[<span class="string">'wsgi.errors'</span>]       = sys.stderr</span><br><span class="line">        env[<span class="string">'wsgi.multithread'</span>]  = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.multiprocess'</span>] = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.run_once'</span>]     = <span class="literal">False</span></span><br><span class="line">        <span class="comment"># Required CGI variables</span></span><br><span class="line">        env[<span class="string">'REQUEST_METHOD'</span>]    = self.request_method    <span class="comment"># GET</span></span><br><span class="line">        env[<span class="string">'PATH_INFO'</span>]         = self.path              <span class="comment"># /hello</span></span><br><span class="line">        env[<span class="string">'SERVER_NAME'</span>]       = self.server_name       <span class="comment"># localhost</span></span><br><span class="line">        env[<span class="string">'SERVER_PORT'</span>]       = str(self.server_port)  <span class="comment"># 8888</span></span><br><span class="line">        <span class="keyword">return</span> env</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(self, status, response_headers, exc_info=None)</span>:</span></span><br><span class="line">        <span class="comment"># Add necessary server headers</span></span><br><span class="line">        server_headers = [</span><br><span class="line">            (<span class="string">'Date'</span>, <span class="string">'Mon, 15 Jul 2019 5:54:48 GMT'</span>),</span><br><span class="line">            (<span class="string">'Server'</span>, <span class="string">'WSGIServer 0.2'</span>),</span><br><span class="line">        ]</span><br><span class="line">        self.headers_set = [status, response_headers + server_headers]</span><br><span class="line">        <span class="comment"># To adhere to WSGI specification the start_response must return</span></span><br><span class="line">        <span class="comment"># a 'write' callable. We simplicity's sake we'll ignore that detail</span></span><br><span class="line">        <span class="comment"># for now.</span></span><br><span class="line">        <span class="comment"># return self.finish_response</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">finish_response</span><span class="params">(self, result)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            status, response_headers = self.headers_set</span><br><span class="line">            response = <span class="string">f'HTTP/1.1 <span class="subst">&#123;status&#125;</span>\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> header <span class="keyword">in</span> response_headers:</span><br><span class="line">                response += <span class="string">'&#123;0&#125;: &#123;1&#125;\r\n'</span>.format(*header)</span><br><span class="line">            response += <span class="string">'\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> data <span class="keyword">in</span> result:</span><br><span class="line">                response += data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">            <span class="comment"># Print formatted response data a la 'curl -v'</span></span><br><span class="line">            print(<span class="string">''</span>.join(</span><br><span class="line">                <span class="string">f'&gt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> response.splitlines()</span><br><span class="line">            ))</span><br><span class="line">            response_bytes = response.encode()</span><br><span class="line">            self.client_connection.sendall(response_bytes)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.client_connection.close()</span><br></pre></td></tr></table></figure>
+
+<h3 id="Concurrent-with-Linux’s-Non-blocking-I-O"><a href="#Concurrent-with-Linux’s-Non-blocking-I-O" class="headerlink" title="Concurrent with Linux’s Non-blocking I/O"></a>Concurrent with Linux’s Non-blocking I/O</h3><p>The multi-processing version still have problems, like when there are massive connections, the server will create massive processes for each connection. this will exaust the server resources, and also process-switching is expensive. to achive that, you will think using process pool.  </p>
+<p>But let’s think from another side, the server maily handles I/O tasks, i.e waitting socket to be readable, read the data and process it, and write to socket. for this kind of task, we use Non-Blocking I/O.</p>
+<p>Suppose you’re a webserver. Every time you accept a connection with the accept system call (here’s the man page), you get a new file descriptor representing that connection.</p>
+<p>If you’re a web server, you might have thousands of connections open at the same time. You need to know when people send you new data on those connections, so you can process and respond to them.</p>
+<p>You could have a loop that basically does:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> open_connections:</span><br><span class="line">    <span class="keyword">if</span> has_new_input(x):</span><br><span class="line">        process_input(x)</span><br></pre></td></tr></table></figure>
+
+<p>The problem with this is that it can waste a lot of CPU time. Instead of spending all CPU time to ask “are there updates now? how about now? how about now? how about now?“, instead we’d rather just ask the Linux kernel “hey, here are 100 file descriptors. Tell me when one of them is updated!“.</p>
+<p>The 3 system calls that let you ask Linux to monitor lots of file descriptors are poll, epoll and select. Let’s start with poll and select because that’s where the chapter started.</p>
+<p>I am not gonna talk the details between <code>select/poll/epoll</code>, you can read this post for more: <a href="https://jvns.ca/blog/2017/06/03/async-io-on-linux--select--poll--and-epoll/" target="_blank" rel="noopener">async io on linux select/poll/epoll</a>.</p>
+<p>Python’s select module have support for Linux’s <code>select/poll/epoll</code>, let’s use select rewrite our wsgi server:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIServer</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    address_family = socket.AF_INET</span><br><span class="line">    socket_type = socket.SOCK_STREAM</span><br><span class="line">    request_queue_size = <span class="number">1024</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address)</span>:</span></span><br><span class="line">        <span class="comment"># Create a listening socket</span></span><br><span class="line">        self.listen_socket = listen_socket = socket.socket(</span><br><span class="line">            self.address_family,</span><br><span class="line">            self.socket_type</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># Allow to reuse the same address</span></span><br><span class="line">        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="number">1</span>)</span><br><span class="line">        listen_socket.setblocking(<span class="number">0</span>)</span><br><span class="line">        <span class="comment"># Bind</span></span><br><span class="line">        listen_socket.bind(server_address)</span><br><span class="line">        <span class="comment"># Activate</span></span><br><span class="line">        listen_socket.listen(self.request_queue_size)</span><br><span class="line">        <span class="comment"># Get server host name and port</span></span><br><span class="line">        host, port = self.listen_socket.getsockname()[:<span class="number">2</span>]</span><br><span class="line">        self.server_name = socket.getfqdn(host)</span><br><span class="line">        self.server_port = port</span><br><span class="line">        <span class="comment"># Return headers set by Web framework/Web application</span></span><br><span class="line">        self.headers_set = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_app</span><span class="params">(self, application)</span>:</span></span><br><span class="line">        self.application = application</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        rlist, wlist, elist = [self.listen_socket], [], []</span><br><span class="line"></span><br><span class="line">        <span class="comment"># listen_socket = self.listen_socket</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            readables, writables, exceptions = select.select(rlist, wlist, elist)</span><br><span class="line">            <span class="keyword">for</span> sock <span class="keyword">in</span> readables:</span><br><span class="line">                <span class="keyword">if</span> sock <span class="keyword">is</span> self.listen_socket:</span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        conn, client_address = self.listen_socket.accept()</span><br><span class="line">                    <span class="keyword">except</span> IOError <span class="keyword">as</span> e:</span><br><span class="line">                        code, msg = e.args</span><br><span class="line">                        <span class="keyword">if</span> code == errno.EINTR:</span><br><span class="line">                            <span class="keyword">continue</span></span><br><span class="line">                        <span class="keyword">else</span>:</span><br><span class="line">                            <span class="keyword">raise</span></span><br><span class="line">                    rlist.append(conn)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        request_data = sock.recv(<span class="number">1024</span>)</span><br><span class="line">                    <span class="keyword">except</span> ConnectionResetError <span class="keyword">as</span> e:</span><br><span class="line">                        request_data = <span class="literal">None</span></span><br><span class="line">                    <span class="keyword">if</span> <span class="keyword">not</span> request_data:</span><br><span class="line">                        sock.close()</span><br><span class="line">                        rlist.remove(sock)</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        request_data = request_data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">                        print(<span class="string">''</span>.join(</span><br><span class="line">                            <span class="string">f'&lt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> request_data.splitlines()</span><br><span class="line">                        ))</span><br><span class="line">                        <span class="comment"># parse request</span></span><br><span class="line">                        (request_method, path, request_version) = self.parse_request(request_data)</span><br><span class="line">                        env = self.get_environ(</span><br><span class="line">                            request_data, request_method, path,</span><br><span class="line">                            self.server_name, self.server_port</span><br><span class="line">                        )</span><br><span class="line">                        result = self.application(env, self.start_response)</span><br><span class="line">                        self.finish_response(result, sock)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_request</span><span class="params">(cls, text)</span>:</span></span><br><span class="line">        request_line = text.splitlines()[<span class="number">0</span>]</span><br><span class="line">        request_line = request_line.rstrip(<span class="string">'\r\n'</span>)</span><br><span class="line">        <span class="keyword">return</span> request_line.split()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_environ</span><span class="params">(self, request_data, request_method, path, server_name, server_port)</span>:</span></span><br><span class="line">        env = &#123;&#125;</span><br><span class="line">        <span class="comment"># The following code snippet does not follow PEP8 conventions</span></span><br><span class="line">        <span class="comment"># but it's formatted the way it is for demonstration purposes</span></span><br><span class="line">        <span class="comment"># to emphasize the required variables and their values</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># Required WSGI variables</span></span><br><span class="line">        env[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">        env[<span class="string">'wsgi.url_scheme'</span>]   = <span class="string">'http'</span></span><br><span class="line">        env[<span class="string">'wsgi.input'</span>]        = io.StringIO(request_data)</span><br><span class="line">        env[<span class="string">'wsgi.errors'</span>]       = sys.stderr</span><br><span class="line">        env[<span class="string">'wsgi.multithread'</span>]  = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.multiprocess'</span>] = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.run_once'</span>]     = <span class="literal">False</span></span><br><span class="line">        <span class="comment"># Required CGI variables</span></span><br><span class="line">        env[<span class="string">'REQUEST_METHOD'</span>]    = request_method    <span class="comment"># GET</span></span><br><span class="line">        env[<span class="string">'PATH_INFO'</span>]         = path              <span class="comment"># /hello</span></span><br><span class="line">        env[<span class="string">'SERVER_NAME'</span>]       = server_name       <span class="comment"># localhost</span></span><br><span class="line">        env[<span class="string">'SERVER_PORT'</span>]       = str(server_port)  <span class="comment"># 8888</span></span><br><span class="line">        <span class="keyword">return</span> env</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(self, status, response_headers, exc_info=None)</span>:</span></span><br><span class="line">        <span class="comment"># Add necessary server headers</span></span><br><span class="line">        server_headers = [</span><br><span class="line">            (<span class="string">'Date'</span>, <span class="string">'Mon, 15 Jul 2019 5:54:48 GMT'</span>),</span><br><span class="line">            (<span class="string">'Server'</span>, <span class="string">'WSGIServer 0.2'</span>),</span><br><span class="line">        ]</span><br><span class="line">        self.headers_set = [status, response_headers + server_headers]</span><br><span class="line">        <span class="comment"># To adhere to WSGI specification the start_response must return</span></span><br><span class="line">        <span class="comment"># a 'write' callable. We simplicity's sake we'll ignore that detail</span></span><br><span class="line">        <span class="comment"># for now.</span></span><br><span class="line">        <span class="comment"># return self.finish_response</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">finish_response</span><span class="params">(self, result, conn)</span>:</span></span><br><span class="line">        status, response_headers = self.headers_set</span><br><span class="line">        response = <span class="string">f'HTTP/1.1 <span class="subst">&#123;status&#125;</span>\r\n'</span></span><br><span class="line">        <span class="keyword">for</span> header <span class="keyword">in</span> response_headers:</span><br><span class="line">            response += <span class="string">'&#123;0&#125;: &#123;1&#125;\r\n'</span>.format(*header)</span><br><span class="line">        response += <span class="string">'\r\n'</span></span><br><span class="line">        <span class="keyword">for</span> data <span class="keyword">in</span> result:</span><br><span class="line">            response += data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="comment"># Print formatted response data a la 'curl -v'</span></span><br><span class="line">        print(<span class="string">''</span>.join(</span><br><span class="line">            <span class="string">f'&gt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> response.splitlines()</span><br><span class="line">        ))</span><br><span class="line">        response_bytes = response.encode()</span><br><span class="line">        conn.sendall(response_bytes)</span><br></pre></td></tr></table></figure>
+
+<p>we use following code tell os that give the readable and writable file descriptors when possible:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readables, writables, exceptions = select.select(rlist, wlist, elist)</span><br></pre></td></tr></table></figure>
+
+<p>and then we loop the <code>readables</code>, if it is a listen_socket, we accept it. if it is a socket with income data, we read it.</p>
+<h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>Let’s benchmark our wsgi server with following web application, also against Gunicorn:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/hello')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello_world</span><span class="params">()</span>:</span></span><br><span class="line">    time.sleep(<span class="number">0.2</span>)  <span class="comment"># simulate that your bussiness logic will take 200 ms</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'Hello World'</span></span><br></pre></td></tr></table></figure>
+
+<p>to benchmark, we use <code>wrk</code> as following:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wrk -c 1000 -d 60 -t 8 http://localhost:8888/hello</span><br></pre></td></tr></table></figure>
+
+<p>Gunicorn config:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gunicorn -w 8 flask_hello:app</span><br></pre></td></tr></table></figure>
+
+<p>Here is the result for multi-processing version:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">09:00 $ wrk -c 1000 -d 60 -t 8 http://localhost:8888/hello</span><br><span class="line">Running 1m <span class="built_in">test</span> @ http://localhost:8888/hello</span><br><span class="line">  8 threads and 1000 connections</span><br><span class="line">  Thread Stats   Avg      Stdev     Max   +/- Stdev</span><br><span class="line">    Latency   202.47ms  144.58ms   1.99s    94.69%</span><br><span class="line">    Req/Sec    92.84     40.03   282.00     66.11%</span><br><span class="line">  44396 requests <span class="keyword">in</span> 1.00m, 6.35MB <span class="built_in">read</span></span><br><span class="line">  Socket errors: connect 0, <span class="built_in">read</span> 44536, write 437, timeout 214</span><br><span class="line">Requests/sec:    739.07</span><br><span class="line">Transfer/sec:    108.26KB</span><br></pre></td></tr></table></figure>
+
+<p>Here is the result for Non-Blocking IO version:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">09:07 $ wrk -c 1000 -d 60 -t 8 http://localhost:8888/hello</span><br><span class="line">Running 1m <span class="built_in">test</span> @ http://localhost:8888/hello</span><br><span class="line">  8 threads and 1000 connections</span><br><span class="line">  Thread Stats   Avg      Stdev     Max   +/- Stdev</span><br><span class="line">    Latency   139.15ms   49.91ms   1.91s    77.01%</span><br><span class="line">    Req/Sec   519.52    211.03     1.42k    73.73%</span><br><span class="line">  247992 requests <span class="keyword">in</span> 1.00m, 35.48MB <span class="built_in">read</span></span><br><span class="line">  Socket errors: connect 0, <span class="built_in">read</span> 38, write 0, timeout 417</span><br><span class="line">Requests/sec:   4128.61</span><br><span class="line">Transfer/sec:    604.78KB</span><br></pre></td></tr></table></figure>
+
+<p>Here is the result with Gunicorn multi-processing version</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">09:03 $ wrk -c 1000 -d 60 -t 8 http://localhost:8000/hello</span><br><span class="line">Running 1m <span class="built_in">test</span> @ http://localhost:8000/hello</span><br><span class="line">  8 threads and 1000 connections</span><br><span class="line">  Thread Stats   Avg      Stdev     Max   +/- Stdev</span><br><span class="line">    Latency    43.78ms   77.65ms   1.97s    97.56%</span><br><span class="line">    Req/Sec   472.75    350.11     2.76k    81.24%</span><br><span class="line">  217149 requests <span class="keyword">in</span> 1.00m, 35.41MB <span class="built_in">read</span></span><br><span class="line">  Socket errors: connect 0, <span class="built_in">read</span> 78, write 147, timeout 94</span><br><span class="line">Requests/sec:   3613.30</span><br><span class="line">Transfer/sec:    603.39KB</span><br></pre></td></tr></table></figure>
+
+<p>here is the result on my Linux book:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Single Process</th>
+<th>Multi-Process</th>
+<th>Non-Blocking I/O</th>
+<th>Gunicorn</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>QPS</td>
+<td>todo</td>
+<td>739</td>
+<td>4128</td>
+<td>3613</td>
+</tr>
+</tbody></table>
+<p>And found an interesting thing, Non-Blocking IO will use one process but also can support high qps, at the same time, it takes less CPU than Gunicorn pre-fork model.</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="https://www.python.org/dev/peps/pep-0333/#implementation-application-notes" target="_blank" rel="noopener">PEP 333: Python web server gateway interfaces v1.0</a><br><a href="https://ruslanspivak.com/lsbaws-part2/" target="_blank" rel="noopener">Let’s build a web server</a><br><a href="https://jvns.ca/blog/2017/06/03/async-io-on-linux--select--poll--and-epoll/" target="_blank" rel="noopener">async io on linux select/poll/epoll</a>  </p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/04/10/Gunicorn-an-inside-view-of-it/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Gunicorn, an inside view of it
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/08/WSGI-服务器性能分析/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">WSGI 服务器性能分析【译】</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Let-s-build-a-WSGI-server" data-title="Let&#39;s build a WSGI server" data-url="http://yoursite.com/2020/03/22/Let-s-build-a-WSGI-server/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

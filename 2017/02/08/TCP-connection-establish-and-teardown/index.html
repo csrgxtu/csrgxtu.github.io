@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>TCP connection establish and teardown | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="This article gonna illustrate the basics of the procedure of tcp connection establish and teardown, also with some practical experiments.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP connection establish and teardown">
+<meta property="og:url" content="http://yoursite.com/2017/02/08/TCP-connection-establish-and-teardown/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="This article gonna illustrate the basics of the procedure of tcp connection establish and teardown, also with some practical experiments.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://d2r5da613aq50s.cloudfront.net/wp-content/uploads/296299.image0.jpg">
+<meta property="og:image" content="http://yoursite.com/img/tcphandshake.png">
+<meta property="og:image" content="http://yoursite.com/img/connectionAndtermnination.png">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TCP connection establish and teardown">
+<meta name="twitter:description" content="This article gonna illustrate the basics of the procedure of tcp connection establish and teardown, also with some practical experiments.">
+<meta name="twitter:image" content="http://d2r5da613aq50s.cloudfront.net/wp-content/uploads/296299.image0.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-TCP-connection-establish-and-teardown" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/02/08/TCP-connection-establish-and-teardown/" class="article-date">
+  	<time datetime="2017-02-08T05:53:21.000Z" itemprop="datePublished">2017-02-08</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      TCP connection establish and teardown
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>This article gonna illustrate the basics of the procedure of tcp connection establish and teardown, also with some practical experiments.</p>
+<a id="more"></a>
+
+<p>关于TCP/IP，读者可以仔细阅读Richard Stevens的著作《Unix Network Programming》《TCP/IP Illustrated》，还需要更详细的信息，请阅读RFC文档。</p>
+<p>TCP, UDP层位于IP层上面，如下图为OSI和TCP/IP模型图：<br><img src="http://d2r5da613aq50s.cloudfront.net/wp-content/uploads/296299.image0.jpg" alt="tcp/ip osi"></p>
+<p>TCP的链接建立需要三次交换数据包，而链接断开需要四次数据包交换，所以分别叫做三次握手和四次挥手。如下图所示：<br><img src="/img/tcphandshake.png" alt="tcp handshake"></p>
+<p>** 链接建立 **<br>client 通过sys call connect 建立到server的链接  </p>
+<ul>
+<li><p>client首先发送SYN包，里面带有client这端的ISN(C)和一些options，在包的header里面，SYN二进制位为TRUE</p>
+</li>
+<li><p>server接收client的SYN（client)，根据sequence number对其确认，并同时发送server端的ISN（S）。即ACK+SYN包</p>
+</li>
+<li><p>client接收来自server的ACK+SYN，对server的sequece number进行ACK，即发送ACK包</p>
+</li>
+</ul>
+<p>** 链接中断 **<br>这里假设client首先发起断开链接的请求<br>client通过调用sys call close 或者shutdown实现断开链接的操作  </p>
+<ul>
+<li>client发送FIN+ACK包，ACK是对当前接收到的包的确认，里面含有当前的sequence number和ack value。  </li>
+<li>server接收client的FIN+ACK包，对其按照client的sequece number进行确认。  </li>
+<li>server发送FIN+ACK包，里面含有server端当前的sequece number和ack。  </li>
+<li>client接收到server的FIN+ACK，对其确认。</li>
+</ul>
+<h4 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h4><p>下面两段代码表示client连接到服务端，向服务端发送一个文本消息，服务端回复一个文本消息，服务端断开，客户端断开。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// client.c</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">error</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *msg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    perror(msg);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> sockfd, portno, n;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv_addr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hostent</span> *<span class="title">server</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> (argc &lt; <span class="number">3</span>) &#123;</span><br><span class="line">       <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">"usage %s hostname port\n"</span>, argv[<span class="number">0</span>]);</span><br><span class="line">       <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    portno = atoi(argv[<span class="number">2</span>]);</span><br><span class="line">    sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>)</span><br><span class="line">        error(<span class="string">"ERROR opening socket"</span>);</span><br><span class="line">    server = gethostbyname(argv[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">if</span> (server == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">"ERROR, no such host\n"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    bzero((<span class="keyword">char</span> *) &amp;serv_addr, <span class="keyword">sizeof</span>(serv_addr));</span><br><span class="line">    serv_addr.sin_family = AF_INET;</span><br><span class="line">    bcopy((<span class="keyword">char</span> *)server-&gt;h_addr,</span><br><span class="line">         (<span class="keyword">char</span> *)&amp;serv_addr.sin_addr.s_addr,</span><br><span class="line">         server-&gt;h_length);</span><br><span class="line">    serv_addr.sin_port = htons(portno);</span><br><span class="line">    <span class="keyword">if</span> (connect(sockfd,(struct sockaddr *) &amp;serv_addr,<span class="keyword">sizeof</span>(serv_addr)) &lt; <span class="number">0</span>)</span><br><span class="line">        error(<span class="string">"ERROR connecting"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Please enter the message: "</span>);</span><br><span class="line">    bzero(buffer,<span class="number">256</span>);</span><br><span class="line">    fgets(buffer,<span class="number">255</span>,<span class="built_in">stdin</span>);</span><br><span class="line">    n = write(sockfd,buffer,<span class="built_in">strlen</span>(buffer));</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">0</span>)</span><br><span class="line">         error(<span class="string">"ERROR writing to socket"</span>);</span><br><span class="line">    bzero(buffer,<span class="number">256</span>);</span><br><span class="line">    n = read(sockfd,buffer,<span class="number">255</span>);</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">0</span>)</span><br><span class="line">         error(<span class="string">"ERROR reading from socket"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s\n"</span>,buffer);</span><br><span class="line">    close(sockfd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//server.c</span></span><br><span class="line"><span class="comment">/* A simple server in the internet domain using TCP</span></span><br><span class="line"><span class="comment">   The port number is passed as an argument */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">error</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *msg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    perror(msg);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">     <span class="keyword">int</span> sockfd, newsockfd, portno;</span><br><span class="line">     <span class="keyword">socklen_t</span> clilen;</span><br><span class="line">     <span class="keyword">char</span> buffer[<span class="number">256</span>];</span><br><span class="line">     <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serv_addr</span>, <span class="title">cli_addr</span>;</span></span><br><span class="line">     <span class="keyword">int</span> n;</span><br><span class="line">     <span class="keyword">if</span> (argc &lt; <span class="number">2</span>) &#123;</span><br><span class="line">         <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">"ERROR, no port provided\n"</span>);</span><br><span class="line">         <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">     <span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>)</span><br><span class="line">        error(<span class="string">"ERROR opening socket"</span>);</span><br><span class="line">     bzero((<span class="keyword">char</span> *) &amp;serv_addr, <span class="keyword">sizeof</span>(serv_addr));</span><br><span class="line">     portno = atoi(argv[<span class="number">1</span>]);</span><br><span class="line">     serv_addr.sin_family = AF_INET;</span><br><span class="line">     serv_addr.sin_addr.s_addr = INADDR_ANY;</span><br><span class="line">     serv_addr.sin_port = htons(portno);</span><br><span class="line">     <span class="keyword">if</span> (bind(sockfd, (struct sockaddr *) &amp;serv_addr,</span><br><span class="line">              <span class="keyword">sizeof</span>(serv_addr)) &lt; <span class="number">0</span>)</span><br><span class="line">              error(<span class="string">"ERROR on binding"</span>);</span><br><span class="line">     listen(sockfd,<span class="number">5</span>);</span><br><span class="line">     clilen = <span class="keyword">sizeof</span>(cli_addr);</span><br><span class="line">     newsockfd = accept(sockfd,</span><br><span class="line">                 (struct sockaddr *) &amp;cli_addr,</span><br><span class="line">                 &amp;clilen);</span><br><span class="line">     <span class="keyword">if</span> (newsockfd &lt; <span class="number">0</span>)</span><br><span class="line">          error(<span class="string">"ERROR on accept"</span>);</span><br><span class="line">     bzero(buffer,<span class="number">256</span>);</span><br><span class="line">     n = read(newsockfd,buffer,<span class="number">255</span>);</span><br><span class="line">     <span class="keyword">if</span> (n &lt; <span class="number">0</span>) error(<span class="string">"ERROR reading from socket"</span>);</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"Here is the message: %s\n"</span>,buffer);</span><br><span class="line">     n = write(newsockfd,<span class="string">"I got your message"</span>,<span class="number">18</span>);</span><br><span class="line">     <span class="keyword">if</span> (n &lt; <span class="number">0</span>) error(<span class="string">"ERROR writing to socket"</span>);</span><br><span class="line">     close(newsockfd);</span><br><span class="line">     close(sockfd);</span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下图是在Ubuntu 14.04 Linux上通过client, server通信抓包的分析截图：<br><img src="/img/connectionAndtermnination.png" alt="connectionAndtermination.png"><br>** 链接建立 **<br>从上图可以看出，编号为276的数据包是client和server建立链接的第一SYN包，277为server对client SYN的确认以及自己的SYN包，278为client对server的SYN确认，至此，TCP链接正式建立，可以开始发送数据了。</p>
+<p>** 发送数据 **<br>编号296为client向server主动发送的一个文本消息，297为server对消息的确认。298为server想client发送的一个文本消息。</p>
+<p>** 断开链接 **<br>编号299的数据包为server发送完文本消息后主动断开链接，通过设置TCP header的FIN标志位。300为client接收到server发送过来的FIN包对其确认。client端通过调用close方法发送FIN包（编号301）给服务端，然后服务端对其确认(编号302)。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>上面只是TCP链接建立中断的最基本的过程，其中的特殊情况处理，可携带的参数等详细信息参考书籍&lt;&lt;TCP/IP Illustrated Volumne I&gt;&gt;.</p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/02/12/为什么会感觉到痛苦/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          为什么会感觉到痛苦
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/07/shadowsocks-tutorial/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">shadowsocks tutorial</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="TCP-connection-establish-and-teardown" data-title="TCP connection establish and teardown" data-url="http://yoursite.com/2017/02/08/TCP-connection-establish-and-teardown/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

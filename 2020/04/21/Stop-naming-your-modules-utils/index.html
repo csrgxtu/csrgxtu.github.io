@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Stop naming your modules utils [转] | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="看到这篇文章的时候，内心是崩溃的，里面说的bad practice我们目前项目中都有，一个不落。就像写出了非Pythonic的代码，它没有validate Python Grammer，可以正常工作，但就是维护起来费劲。所以说在正确的前提下，我们要尽量在工程中做到这些Best Pracice说到的东西。">
+<meta name="keywords" content="Software Engeering,Best practice">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stop naming your modules utils [转]">
+<meta property="og:url" content="http://yoursite.com/2020/04/21/Stop-naming-your-modules-utils/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="看到这篇文章的时候，内心是崩溃的，里面说的bad practice我们目前项目中都有，一个不落。就像写出了非Pythonic的代码，它没有validate Python Grammer，可以正常工作，但就是维护起来费劲。所以说在正确的前提下，我们要尽量在工程中做到这些Best Pracice说到的东西。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Stop naming your modules utils [转]">
+<meta name="twitter:description" content="看到这篇文章的时候，内心是崩溃的，里面说的bad practice我们目前项目中都有，一个不落。就像写出了非Pythonic的代码，它没有validate Python Grammer，可以正常工作，但就是维护起来费劲。所以说在正确的前提下，我们要尽量在工程中做到这些Best Pracice说到的东西。">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Stop-naming-your-modules-utils" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/04/21/Stop-naming-your-modules-utils/" class="article-date">
+  	<time datetime="2020-04-21T08:39:53.000Z" itemprop="datePublished">2020-04-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Stop naming your modules utils [转]
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Best-practice/">Best practice</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Software-Engeering/">Software Engeering</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看到这篇文章的时候，内心是崩溃的，里面说的bad practice我们目前项目中都有，一个不落。就像写出了非Pythonic的代码，它没有validate Python Grammer，可以正常工作，但就是维护起来费劲。所以说在正确的前提下，我们要尽量在工程中做到这些Best Pracice说到的东西。</p>
+<a id="more"></a>
+<p>总结原文就是我们会在某些情况下将一些通用的或者无法归类的逻辑放在诸如：<code>util</code>, <code>common</code>等模块中</p>
+<ul>
+<li>单个无法归类的function放入util中</li>
+<li>多个模块公用的就放在了common中</li>
+</ul>
+<p>然后后续的programmer因为这个会继续向util中添加很多逻辑，久而久之其变的更加多元化，不确定。当你看到这个模块的时候，你无法确定其具体实现了什么功能，在其它项目模块需要使用util or common中的方法的时候需要将其整体引入的项目中，增加了代码复杂度。</p>
+<p>总而言之，根据Python的哲学：Explicit is better than implicit，我们应该保持项目的简介清晰，尽量避免一些模棱两可的东西。</p>
+<p>下面是原文：<br>Imagine the following situation: there is a software developer that is either adding new code or refactoring existing one by extracting a class/function. They have to place code somewhere, but it does not seem to fit anywhere. So what does a developer do? They create a new module – utils.py.</p>
+<h3 id="Why-utils-is-a-terrible-name"><a href="#Why-utils-is-a-terrible-name" class="headerlink" title="Why utils is a terrible name?"></a>Why utils is a terrible name?</h3><p>utils is arguably one of the worst names for a module because it is very blurry and imprecise. Such a name does not say what is the purpose of code inside. On the contrary, a utils module can as well contain almost anything. By naming a module utils, a software developer lays down perfect conditions for an incohesive code blob. Since the module name does not hint team members if something fits there or not, it is likely that unrelated code will eventually appear there, as more utils. More on it later.</p>
+<p>Synonyms of utils, like helpers, commons, etc. are bad for the same reason.</p>
+<h3 id="Why-people-do-this"><a href="#Why-people-do-this" class="headerlink" title="Why people do this?"></a>Why people do this?</h3><h4 id="Excuse-I-–-it-is-just-one-function"><a href="#Excuse-I-–-it-is-just-one-function" class="headerlink" title="Excuse I – it is just one function"></a>Excuse I – it is just one function</h4><p>Initially, yes – it may be just one function. One function in a badly named module is not that wrong, isn’t it?</p>
+<p>It is. Similarly to the broken windows theory, one occurrence of misbehaviour invites more of them. One function or class in utils is a small problem, indeed. Hence, it should be refactored when it is easy. Once the utils module grows, it will require a lot more effort to split it. And surprise, surprise, no one will be willing to do that.</p>
+<p>How bad it can get? Once, in one Python repository, I saw there were several utils.py modules. My favourite contained 13 various functions and one utility class. What were these functions doing? Everything, from validation to data normalization to saving to the database to sending HTTP requests to getting current datetime formatted accordingly to the format parameter (Yes, separate, loose functions).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_post_request</span><span class="params">(url, data, logger)</span>:</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_details</span><span class="params">(source_obj, override_data_from_source_obj: dict = None)</span>:</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">normalize_address</span><span class="params">(address: str)</span> -&gt; str:</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>That’s how programming hell looks like. utils.py quickly becomes a whirlpool for all code that does not fit other places. It smoothly leads us to excuse number 2…</p>
+<h4 id="Excuse-II-–-There-is-no-other-place-to-put-this-code"><a href="#Excuse-II-–-There-is-no-other-place-to-put-this-code" class="headerlink" title="Excuse II – There is no other place to put this code"></a>Excuse II – There is no other place to put this code</h4><p>Indeed, there may be no place that a new class/function fits. Reaction to create a new place for the code is good. However, a programmer needs to put more effort when thinking about the name. As we know, taking the easiest road with utils is a slippery slope.</p>
+<p>We can do better by naming module by the purpose of functions living inside. If they will be creating other objects, let’s name it factories.py. If their role is validation – go for validators.py. Maybe we need a few functions that operate on phone numbers? See if they could not be a regular, stateful class PhoneNumber and just put it in a separate file – phone_number.py.</p>
+<p>A special case – functions with business logic. There are many techniques for that, some of them are more sophisticated than others (e.g. the Clean Architecture) but let’s consider a simple case. Assuming we have Django + DRF web application that contains business logic in serializers. We slowly migrate our API to version 2 and we need to put business logic extracted from V1 serializer in some other place, so that serializer V2 may reuse that. DO NOT PUT THIS IN utils.py. Try putting business logic in services.py module. Name service comes from an application service – a single thing that the application does for the clients. If this was, for example, booking a flight, a service could be named flight_booking_service and would:</p>
+<ul>
+<li>authorize payment on customer’s payment card</li>
+<li>reserve a flight using 3rd party provider</li>
+<li>send an email (or scheduled a Celery task to do so)</li>
+</ul>
+<h4 id="Excuse-III-I-need-a-place-for-company-commons"><a href="#Excuse-III-I-need-a-place-for-company-commons" class="headerlink" title="Excuse III I need a place for company commons"></a>Excuse III I need a place for company commons</h4><p>Let’s say you are building a distributed application and there are chunks of code that needs to be reused in a majority or all microservices. It is a natural reaction to put them together in someplace, like a separate repository to be installed as a package. But please don’t call it {company_name}-utils. I heard about a case of such a repository, but luckily for its maintainers, it was not that big. It contains code responsible for:</p>
+<p>secrets handling, using public cloud services<br>logging configuration that uses specific public services<br>As I said, it’s not that bad but it would be nice if they were more specific with the name, for example, cloud-toolkit or split that into two separate repositories/packages because frankly there are microservices that use only one of functionalities.</p>
+<h4 id="Excuse-IIII-–-But-Django-does-that"><a href="#Excuse-IIII-–-But-Django-does-that" class="headerlink" title="Excuse IIII – But Django does that"></a>Excuse IIII – But Django does that</h4><p>Yes, there is a couple of utils packages in Django. Shame on them for using utils name. However, notice that at least some of them could be separated from the framework and bundled as optional dependencies. Also, at least they are grouped in cohesive sub-packages – e.g. django.utils.timezone or django.utils.translation.</p>
+<p>Unless you are writing a framework, stay away from utils. 😉</p>
+<h4 id="Are-all-utils-bad"><a href="#Are-all-utils-bad" class="headerlink" title="Are all utils bad?"></a>Are all utils bad?</h4><p>Not exactly. Eventually, one may need a couple of auxiliary functions. In that case, organize such code in modules named by theme – like datetimes, phone_numbers, etc. Such functions should be pure (in terms of functional programming).</p>
+<p>Pure Functions – do not have side effects, that is, they do not change the state of the program. Given the same input, a pure function will always produce the same output.</p>
+<p><a href="https://stackabuse.com/functional-programming-in-python/" target="_blank" rel="noopener">https://stackabuse.com/functional-programming-in-python/</a></p>
+<h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>Do not use utils as a name for your Python module neither put it into a class name. Try to be more specific about the role of code – e.g. create a place for validators, services or factories. If the role criterion doesn’t help and you really dealing with utils, try grouping code by its theme –</p>
+<p>utils modules are dangerous, because they deteriorate over time. Each and another person that adds something that does not fit anywhere will happily add it to the utils module, increasing its incohesion. The disorder will grow over time, becoming greater and greater burden to work with.</p>
+<p>If you see a newly created utils module in a code review, request it to be renamed. If you are tempted to add something to existing utils, create a new place for your code and move there everything from utils that fits a newly created module.</p>
+<p>In the end, you will exercise your brain to become better at designing code.</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="https://breadcrumbscollector.tech/stop-naming-your-python-modules-utils/" target="_blank" rel="noopener">Stop naming your python module ‘utils’</a><br><a href="http://www.adam-bien.com/roller/abien/entry/util_packages_are_evil" target="_blank" rel="noopener">Util package are evil</a>  </p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/05/07/How-coroutine-works-internally/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          How coroutine works internally [Drafting]
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/04/21/Python-Dict-a-new-implementation-by-pure-Python/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Python Dict: a new implementation by pure Python</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Stop-naming-your-modules-utils" data-title="Stop naming your modules utils [转]" data-url="http://yoursite.com/2020/04/21/Stop-naming-your-modules-utils/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

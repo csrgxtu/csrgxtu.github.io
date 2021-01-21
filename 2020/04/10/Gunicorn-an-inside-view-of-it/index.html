@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Gunicorn, an inside view of it | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Gunicorn 是一个Python Web Server实现，兼容WSGI协议。其迁移自Ruby世界的Unicorn。在我们的生产环境中，有大量使用Gunicorn作为Web 服务器，所以本文分析Gunicorn的相关几个问题： Server model，Async worker.">
+<meta name="keywords" content="Python,Web Server,Gunicorn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gunicorn, an inside view of it">
+<meta property="og:url" content="http://yoursite.com/2020/04/10/Gunicorn-an-inside-view-of-it/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="Gunicorn 是一个Python Web Server实现，兼容WSGI协议。其迁移自Ruby世界的Unicorn。在我们的生产环境中，有大量使用Gunicorn作为Web 服务器，所以本文分析Gunicorn的相关几个问题： Server model，Async worker.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.spirulasystems.com/wp-content/plugins/phastpress/phast.php?service=images&width=512&height=290&src=https%3A%2F%2Fwww.spirulasystems.com%2Fwp-content%2Fuploads%2F2015%2F01%2Fsync_worker_type1.png&cacheMarker=1557312233-22541&token=a271e359b84a7e6c">
+<meta property="og:image" content="https://circus.readthedocs.org/en/0.5/_images/classical-stack.png">
+<meta property="og:image" content="https://www.spirulasystems.com/wp-content/plugins/phastpress/phast.php?service=images&width=275&height=300&src=https%3A%2F%2Fwww.spirulasystems.com%2Fwp-content%2Fuploads%2F2015%2F01%2Fsync_worker_type2-275x300.png&cacheMarker=1557312233-55428&token=c96103d27e004eef">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gunicorn, an inside view of it">
+<meta name="twitter:description" content="Gunicorn 是一个Python Web Server实现，兼容WSGI协议。其迁移自Ruby世界的Unicorn。在我们的生产环境中，有大量使用Gunicorn作为Web 服务器，所以本文分析Gunicorn的相关几个问题： Server model，Async worker.">
+<meta name="twitter:image" content="https://www.spirulasystems.com/wp-content/plugins/phastpress/phast.php?service=images&width=512&height=290&src=https%3A%2F%2Fwww.spirulasystems.com%2Fwp-content%2Fuploads%2F2015%2F01%2Fsync_worker_type1.png&cacheMarker=1557312233-22541&token=a271e359b84a7e6c">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Gunicorn-an-inside-view-of-it" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/04/10/Gunicorn-an-inside-view-of-it/" class="article-date">
+  	<time datetime="2020-04-09T23:13:00.000Z" itemprop="datePublished">2020-04-10</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Gunicorn, an inside view of it
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gunicorn/">Gunicorn</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web-Server/">Web Server</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Gunicorn 是一个Python Web Server实现，兼容WSGI协议。其迁移自Ruby世界的Unicorn。在我们的生产环境中，有大量使用Gunicorn作为Web 服务器，所以本文分析Gunicorn的相关几个问题： Server model，Async worker.</p>
+<a id="more"></a>
+
+<h3 id="Server-model"><a href="#Server-model" class="headerlink" title="Server model"></a>Server model</h3><p>如果你写过socket编程，应该知道socket server一般是如何支持并发的，比如在socket server启动后，会对每一个进来的请求fork一个新的进程或者线程去处理它。但是这种实现存在问题，比如高并发量情况下，socket server不得不创建很多进程或者线程，创建进程或者线程需要sys call，大量的创建或者销毁会使系统负载过高，进而处理请求能力下降。极限情况是可以创建的进程线程数量会达到OS的limit进而程序崩溃，或者大量的进程线程之间切换耗费太多资源（我们知道OS 进程管理器在做switch操作的时候，需要保存当前进程的状态到内存数据结构中，然后将ready的进程相关资源load进入相关处理器）。  </p>
+<p>一种改进的方案是池化复用。创建固定数量的进程或者线程，所有并发进来的请求都轮流使用池子中的进程线程处理。这种情况下，进程线程只会创建一次，后续会被请求复用，在整个服务器生命周期的最后阶段才会被销毁。这种优化思想在工程中的很多地方都有使用，比如Web app到数据库会有一个连接池，Django celery模型中会使用消息队列池化待处理的任务等等。</p>
+<p>如果大部分请求处理涉及IO，那么更加优化的方案是通过OS提供的IO复用机制（select/poll/epoll）来处理。在一个服务主循环中，IO multiplexing会返回当前可读可写的socket，这样就可以直接使用对应handler处理方法处理read、write ready的socket。这种方式的优点是单进程即可支持很高的并发量，且没有进程创建销毁等操作，资源占用率比较低。但是它一定是处理IO bound task才会有这种优势。</p>
+<p>Gunicorn 采用的是池化复用的技巧，通过服务启动时候，根据你的配置信息，由master进程提前创建好对应的worker进程，然后后续的请求都会通过轮流复用被这些worker进程处理。从单个sync worker进程的视角来看，在某一个时刻，其只能处理一个请求，其它请求要么被其它worker处理中，要么在socket队列pending中。下面是一张其逻辑视图：</p>
+<p><img src="https://www.spirulasystems.com/wp-content/plugins/phastpress/phast.php?service=images&width=512&height=290&src=https%3A%2F%2Fwww.spirulasystems.com%2Fwp-content%2Fuploads%2F2015%2F01%2Fsync_worker_type1.png&cacheMarker=1557312233-22541&token=a271e359b84a7e6c" alt="sync worker"></p>
+<p>总体上，master进程负责启动worker进程并对其管理，包括创建、销毁、新增、减少等操作。worker进程负责监听端口处理请求，其创建启动的时候，会实例化配置好的Python Web application，将接受的http 请求parse，然后调用web application处理，得到返回结果后整理成Http Response通过tcp返回给客户端。如下图：</p>
+<p><img src="https://circus.readthedocs.org/en/0.5/_images/classical-stack.png" alt="master-worker">  </p>
+<h4 id="source-code-analysis"><a href="#source-code-analysis" class="headerlink" title="source code analysis"></a>source code analysis</h4><p>The following code in Gunicorn show it show to start master and workers process. when you type following command in bash: <code>gunicorn -w 4 myapp:app</code>, gunicorn will enter <code>Arbiter.run</code> method, it first start the master by initialize <code>arbiter</code> class instance, like set pid and create socket. it then will create worker process with <code>Arbiter.spawn_worker</code> method, actually use os.fork to create or clone an child process. also in <code>Arbiter.manage_workers</code> you can see how master process manages worker process.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Arbiter</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Arbiter maintain the workers processes alive. It launches or</span></span><br><span class="line"><span class="string">    kills them if needed. It also manages application reloading</span></span><br><span class="line"><span class="string">    via SIGHUP/USR2.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"Main master loop."</span></span><br><span class="line">        self.start()</span><br><span class="line">        util._setproctitle(<span class="string">"master [%s]"</span> % self.proc_name)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.manage_workers()</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            self.log.info(<span class="string">"Unhandled exception in main loop"</span>,</span><br><span class="line">                          exc_info=<span class="literal">True</span>)</span><br><span class="line">            self.stop(<span class="literal">False</span>)</span><br><span class="line">            <span class="keyword">if</span> self.pidfile <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                self.pidfile.unlink()</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""\</span></span><br><span class="line"><span class="string">        Initialize the arbiter. Start listening and set pidfile if needed.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        self.init_signals()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.LISTENERS:</span><br><span class="line">            fds = <span class="literal">None</span></span><br><span class="line">            listen_fds = systemd.listen_fds()</span><br><span class="line">            <span class="keyword">if</span> listen_fds:</span><br><span class="line">                self.systemd = <span class="literal">True</span></span><br><span class="line">                fds = range(systemd.SD_LISTEN_FDS_START,</span><br><span class="line">                            systemd.SD_LISTEN_FDS_START + listen_fds)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">elif</span> self.master_pid:</span><br><span class="line">                fds = []</span><br><span class="line">                <span class="keyword">for</span> fd <span class="keyword">in</span> os.environ.pop(<span class="string">'GUNICORN_FD'</span>).split(<span class="string">','</span>):</span><br><span class="line">                    fds.append(int(fd))</span><br><span class="line"></span><br><span class="line">            self.LISTENERS = sock.create_sockets(self.cfg, self.log, fds)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">manage_workers</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""\</span></span><br><span class="line"><span class="string">        Maintain the number of workers by spawning or killing</span></span><br><span class="line"><span class="string">        as required.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> len(self.WORKERS) &lt; self.num_workers:</span><br><span class="line">            self.spawn_workers()</span><br><span class="line"></span><br><span class="line">        workers = self.WORKERS.items()</span><br><span class="line">        workers = sorted(workers, key=<span class="keyword">lambda</span> w: w[<span class="number">1</span>].age)</span><br><span class="line">        <span class="keyword">while</span> len(workers) &gt; self.num_workers:</span><br><span class="line">            (pid, _) = workers.pop(<span class="number">0</span>)</span><br><span class="line">            self.kill_worker(pid, signal.SIGTERM)</span><br><span class="line"></span><br><span class="line">        active_worker_count = len(workers)</span><br><span class="line">        <span class="keyword">if</span> self._last_logged_active_worker_count != active_worker_count:</span><br><span class="line">            self._last_logged_active_worker_count = active_worker_count</span><br><span class="line">            self.log.debug(<span class="string">"&#123;0&#125; workers"</span>.format(active_worker_count),</span><br><span class="line">                           extra=&#123;<span class="string">"metric"</span>: <span class="string">"gunicorn.workers"</span>,</span><br><span class="line">                                  <span class="string">"value"</span>: active_worker_count,</span><br><span class="line">                                  <span class="string">"mtype"</span>: <span class="string">"gauge"</span>&#125;)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">spawn_worker</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.worker_age += <span class="number">1</span></span><br><span class="line">        worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,</span><br><span class="line">                                   self.app, self.timeout / <span class="number">2.0</span>,</span><br><span class="line">                                   self.cfg, self.log)</span><br><span class="line">        self.cfg.pre_fork(self, worker)</span><br><span class="line">        pid = os.fork()</span><br><span class="line">        <span class="keyword">if</span> pid != <span class="number">0</span>:</span><br><span class="line">            worker.pid = pid</span><br><span class="line">            self.WORKERS[pid] = worker</span><br><span class="line">            <span class="keyword">return</span> pid</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Do not inherit the temporary files of other workers</span></span><br><span class="line">        <span class="keyword">for</span> sibling <span class="keyword">in</span> self.WORKERS.values():</span><br><span class="line">            sibling.tmp.close()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Process Child</span></span><br><span class="line">        worker.pid = os.getpid()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            util._setproctitle(<span class="string">"worker [%s]"</span> % self.proc_name)</span><br><span class="line">            self.log.info(<span class="string">"Booting worker with pid: %s"</span>, worker.pid)</span><br><span class="line">            self.cfg.post_fork(self, worker)</span><br><span class="line">            worker.init_process()</span><br><span class="line">            sys.exit(<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">except</span> SystemExit:</span><br><span class="line">            <span class="keyword">raise</span></span><br><span class="line">        <span class="keyword">except</span> AppImportError <span class="keyword">as</span> e:</span><br><span class="line">            self.log.debug(<span class="string">"Exception while loading the application"</span>,</span><br><span class="line">                           exc_info=<span class="literal">True</span>)</span><br><span class="line">            print(<span class="string">"%s"</span> % e, file=sys.stderr)</span><br><span class="line">            sys.stderr.flush()</span><br><span class="line">            sys.exit(self.APP_LOAD_ERROR)</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            self.log.exception(<span class="string">"Exception in worker process"</span>)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> worker.booted:</span><br><span class="line">                sys.exit(self.WORKER_BOOT_ERROR)</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.log.info(<span class="string">"Worker exiting (pid: %s)"</span>, worker.pid)</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                worker.tmp.close()</span><br><span class="line">                self.cfg.worker_exit(self, worker)</span><br><span class="line">            <span class="keyword">except</span> Exception:</span><br><span class="line">                self.log.warning(<span class="string">"Exception during worker exit:\n%s"</span>,</span><br><span class="line">                                 traceback.format_exc())</span><br></pre></td></tr></table></figure>
+
+<h3 id="Async-worker-type"><a href="#Async-worker-type" class="headerlink" title="Async worker type"></a>Async worker type</h3><p>Gunicorn支持多种worker type，例如Sync，Async，Tonardo，AsyncIO类型的worker。Sync的worker最简单，在上节已经阐述。  </p>
+<p>Async worker是通过Gevent or Eventlet实现，Gevent &amp; Eventlet都是通过Greenlet实现， Greenlet是Python的一个C extension module，其本质是C的co-routine。总体上来说Gevent就是通过co-rotine + 事件循环（libev）实现了异步模型。如果对这里的实现特别感兴趣，推荐看David beezly的<a href="https://www.youtube.com/watch?v=Z_OAlIhXziw" target="_blank" rel="noopener">curious course on corontines and concurrency</a> and Kavya Joshi的  <a href="https://www.youtube.com/watch?v=GunMToxbE0E" target="_blank" rel="noopener">a deep dive into how gevent works</a> </p>
+<p>Async模式下Gunicorn处理请求的流程图如下：</p>
+<p><img src="https://www.spirulasystems.com/wp-content/plugins/phastpress/phast.php?service=images&width=275&height=300&src=https%3A%2F%2Fwww.spirulasystems.com%2Fwp-content%2Fuploads%2F2015%2F01%2Fsync_worker_type2-275x300.png&cacheMarker=1557312233-55428&token=c96103d27e004eef" alt="async worker"><br>一个async worker可以并发的处理很多个请求，每个请求实际上被一个coroutine处理，当其进入IO等待，会主动yield出控制权，这样下一个coroutine就可以执行。当IO ready，会触发事件，事件循环会将对应的coroutine的从yeild出控制权的地方恢复执行。  </p>
+<p>Async worker的corotines会运行在一个进程中，通过来回切换函数来充分利用CPU，减少IO等待时间，其在某个时刻只会有一个routine在cpu上运行。相比于进程线程，coroutine更加轻量，因为其操作的维度是函数而不是整个进程线程。</p>
+<p>Gunicorn have an base worker type for every support worker, that is <code>base.Wrorker</code>, from the def of it, you can see child worker must implement <code>run init_process</code>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># base.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Worker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, age, ppid, sockets, app, timeout, cfg, log)</span>:</span></span><br><span class="line">        <span class="string">""" called in pre-fork """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">notify</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" inform master process that this worker is alive """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""\</span></span><br><span class="line"><span class="string">        This is the mainloop of a worker process. You should override</span></span><br><span class="line"><span class="string">        this method in a subclass to provide the intended behaviour</span></span><br><span class="line"><span class="string">        for your particular evil schemes.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">init_process</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""\</span></span><br><span class="line"><span class="string">        If you override this method in a subclass, the last statement</span></span><br><span class="line"><span class="string">        in the function should be to call this method with</span></span><br><span class="line"><span class="string">        super().init_process() so that the ``run()`` loop is initiated.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        ...</span><br><span class="line">        self.wait_fds = self.sockets + [self.PIPE[<span class="number">0</span>]]</span><br><span class="line"></span><br><span class="line">        self.log.close_on_exec()</span><br><span class="line"></span><br><span class="line">        self.init_signals()</span><br><span class="line"></span><br><span class="line">        self.load_wsgi()</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment"># Enter main run loop</span></span><br><span class="line">        self.booted = <span class="literal">True</span></span><br><span class="line">        self.run()</span><br></pre></td></tr></table></figure>
+
+<p>but for async worker, it will have second parent base type which is <code>base_async.AsyncWorker</code>, which is inherit from <code>base.Worker</code>.<br>it maily defs how to process or handle the request. also Gunicorn have the corresponding SyncWorker defined in <code>sync.py</code>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># base_async.py</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AsyncWorker</span><span class="params">(base.Worker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(self, listener, client, addr)</span>:</span></span><br><span class="line">        req = <span class="literal">None</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            parser = http.RequestParser(self.cfg, client)</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                listener_name = listener.getsockname()</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> self.cfg.keepalive:</span><br><span class="line">                    req = next(parser)</span><br><span class="line">                    self.handle_request(listener_name, req, client, addr)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(self, listener_name, req, sock, addr)</span>:</span></span><br><span class="line">        request_start = datetime.now()</span><br><span class="line">        environ = &#123;&#125;</span><br><span class="line">        resp = <span class="literal">None</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.cfg.pre_request(self, req)</span><br><span class="line">            resp, environ = wsgi.create(req, sock, addr,</span><br><span class="line">                                        listener_name, self.cfg)</span><br><span class="line">            environ[<span class="string">"wsgi.multithread"</span>] = <span class="literal">True</span></span><br><span class="line">            ...</span><br></pre></td></tr></table></figure>
+
+<p>Gevent worker implementation is defined in <code>ggevent.py</code>, which will implement following methods: <code>run</code>, <code>init_process</code>, <code>notify</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ggevent.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GeventWorker</span><span class="params">(AsyncWorker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">notify</span><span class="params">(self)</span>:</span></span><br><span class="line">        super().notify()</span><br><span class="line">        <span class="keyword">if</span> self.ppid != os.getppid():</span><br><span class="line">            self.log.info(<span class="string">"Parent changed, shutting down: %s"</span>, self)</span><br><span class="line">            sys.exit(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">init_process</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.patch()</span><br><span class="line">        hub.reinit()</span><br><span class="line">        super().init_process()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        servers = []</span><br><span class="line">        ssl_args = &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.cfg.is_ssl:</span><br><span class="line">            ssl_args = dict(server_side=<span class="literal">True</span>, **self.cfg.ssl_options)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> self.sockets:</span><br><span class="line">            s.setblocking(<span class="number">1</span>)</span><br><span class="line">            pool = Pool(self.worker_connections)</span><br><span class="line">            <span class="keyword">if</span> self.server_class <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                environ = base_environ(self.cfg)</span><br><span class="line">                environ.update(&#123;</span><br><span class="line">                    <span class="string">"wsgi.multithread"</span>: <span class="literal">True</span>,</span><br><span class="line">                    <span class="string">"SERVER_SOFTWARE"</span>: VERSION,</span><br><span class="line">                &#125;)</span><br><span class="line">                server = self.server_class(</span><br><span class="line">                    s, application=self.wsgi, spawn=pool, log=self.log,</span><br><span class="line">                    handler_class=self.wsgi_handler, environ=environ,</span><br><span class="line">                    **ssl_args)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                hfun = partial(self.handle, s)</span><br><span class="line">                server = StreamServer(s, handle=hfun, spawn=pool, **ssl_args)</span><br><span class="line">                <span class="keyword">if</span> self.cfg.workers &gt; <span class="number">1</span>:</span><br><span class="line">                    server.max_accept = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">            server.start()</span><br><span class="line">            servers.append(server)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> self.alive:</span><br><span class="line">            self.notify()</span><br><span class="line">            gevent.sleep(<span class="number">1.0</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># Stop accepting requests</span></span><br><span class="line">            <span class="keyword">for</span> server <span class="keyword">in</span> servers:</span><br><span class="line">                <span class="keyword">if</span> hasattr(server, <span class="string">'close'</span>):  <span class="comment"># gevent 1.0</span></span><br><span class="line">                    server.close()</span><br><span class="line">                <span class="keyword">if</span> hasattr(server, <span class="string">'kill'</span>):  <span class="comment"># gevent &lt; 1.0</span></span><br><span class="line">                    server.kill()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Handle current requests until graceful_timeout</span></span><br><span class="line">            ts = time.time()</span><br><span class="line">            <span class="keyword">while</span> time.time() - ts &lt;= self.cfg.graceful_timeout:</span><br><span class="line">                accepting = <span class="number">0</span></span><br><span class="line">                <span class="keyword">for</span> server <span class="keyword">in</span> servers:</span><br><span class="line">                    <span class="keyword">if</span> server.pool.free_count() != server.pool.size:</span><br><span class="line">                        accepting += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">                <span class="comment"># if no server is accepting a connection, we can exit</span></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> accepting:</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">                self.notify()</span><br><span class="line">                gevent.sleep(<span class="number">1.0</span>)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Force kill all active the handlers</span></span><br><span class="line">            self.log.warning(<span class="string">"Worker graceful timeout (pid:%s)"</span> % self.pid)</span><br><span class="line">            <span class="keyword">for</span> server <span class="keyword">in</span> servers:</span><br><span class="line">                server.stop(timeout=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>一般来说我们的web application要query db，从第三方api拉取数据等，所以很大概率上这是一个IO bound的task，这就比较适合用Gunicorn的Async worker（gevent）来处理。如果你的服务是一个CPU bound的task，那么用Gunicorn的Sync task就会达到很好的性能。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="https://www.youtube.com/watch?v=GunMToxbE0E" target="_blank" rel="noopener">A deep dive into how gevent works</a><br><a href="https://www.spirulasystems.com/blog/2015/01/20/gunicorn-worker-types/" target="_blank" rel="noopener">Gunicorn worker types</a><br><a href="https://words.volant.is/articles/understanding-gunicorns-async-worker-concurrency-model/" target="_blank" rel="noopener">Understand Gunicorn’s async worker models</a><br><a href="https://github.com/benoitc/gunicorn" target="_blank" rel="noopener">benoitc/gunicorn</a><br><a href="https://docs.gunicorn.org/en/stable/design.html" target="_blank" rel="noopener">Gunicorn Design</a><br><a href="https://www.youtube.com/watch?v=Z_OAlIhXziw" target="_blank" rel="noopener">Curious course on corontines and concurrency</a>  </p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/04/16/Gevent-patch-it-and-pray/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Gevent: patch it and pray
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/22/Let-s-build-a-WSGI-server/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Let&#39;s build a WSGI server</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Gunicorn-an-inside-view-of-it" data-title="Gunicorn, an inside view of it" data-url="http://yoursite.com/2020/04/10/Gunicorn-an-inside-view-of-it/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

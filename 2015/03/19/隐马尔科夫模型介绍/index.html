@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>隐马尔科夫模型介绍 | csrgxtu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="这篇文章主要是阐述什么是HMM–隐马尔科夫模型。通过具体的例子来解释其应用。为了学习HMM模型，我参看了许多文章，书籍论文。觉得这些东西都太学术化了。我是数学系的学生，发现周围师兄老师学生都喜欢用纯数学概念理论公式给人讲道理，不是说了吗,  一个数学公式吓走一半读者一个定理引理证明推导使你觉得自己就是个傻子  数学出身的人做大数据机器学习相关领域就是把数学看的太重了，觉得数学无所不能，数学太重要了">
+<meta name="keywords" content="HMM,隐马尔科夫模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="隐马尔科夫模型介绍">
+<meta property="og:url" content="http://yoursite.com/2015/03/19/隐马尔科夫模型介绍/index.html">
+<meta property="og:site_name" content="csrgxtu">
+<meta property="og:description" content="这篇文章主要是阐述什么是HMM–隐马尔科夫模型。通过具体的例子来解释其应用。为了学习HMM模型，我参看了许多文章，书籍论文。觉得这些东西都太学术化了。我是数学系的学生，发现周围师兄老师学生都喜欢用纯数学概念理论公式给人讲道理，不是说了吗,  一个数学公式吓走一半读者一个定理引理证明推导使你觉得自己就是个傻子  数学出身的人做大数据机器学习相关领域就是把数学看的太重了，觉得数学无所不能，数学太重要了">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-23T17:55:12.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="隐马尔科夫模型介绍">
+<meta name="twitter:description" content="这篇文章主要是阐述什么是HMM–隐马尔科夫模型。通过具体的例子来解释其应用。为了学习HMM模型，我参看了许多文章，书籍论文。觉得这些东西都太学术化了。我是数学系的学生，发现周围师兄老师学生都喜欢用纯数学概念理论公式给人讲道理，不是说了吗,  一个数学公式吓走一半读者一个定理引理证明推导使你觉得自己就是个傻子  数学出身的人做大数据机器学习相关领域就是把数学看的太重了，觉得数学无所不能，数学太重要了">
+  
+    <link rel="alternative" href="/atom.xml" title="csrgxtu" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/jquery.js"></script>
+  <meta name="google-site-verification" content="OjcUjuRmGNrDqLMTgwawveo7-TdwOjB4dEh_qx6tGiU">
+  <meta name="baidu-site-verification" content="0ZJkkBqHkJ">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css">
+</head>
+</html>
+<body>
+  <a class="github-fork-ribbon" href="http://github.com/csrgxtu" title="Fuck me on GayHub">Fuck me on GayHub</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Archer Reilly</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tag</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Me</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/archives">All</a></li>
+				        
+							<li><a href="/">Home</a></li>
+				        
+							<li><a href="/categories/Linux">Linux</a></li>
+				        
+							<li><a href="/categories/DataLab">DataLab</a></li>
+				        
+							<li><a href="/categories/Programming-Language">Programming</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+					        
+								<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+					        
+								<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+					        
+								<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Architecture/" style="font-size: 10px;">Architecture</a> <a href="/tags/Async/" style="font-size: 10px;">Async</a> <a href="/tags/Backend/" style="font-size: 10px;">Backend</a> <a href="/tags/Best-practice/" style="font-size: 10px;">Best practice</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CPtyhon/" style="font-size: 10px;">CPtyhon</a> <a href="/tags/CRF/" style="font-size: 12.5px;">CRF</a> <a href="/tags/Cache/" style="font-size: 12.5px;">Cache</a> <a href="/tags/Chinese-Input-Method/" style="font-size: 10px;">Chinese Input Method</a> <a href="/tags/Cloud/" style="font-size: 10px;">Cloud</a> <a href="/tags/Concurrency/" style="font-size: 15px;">Concurrency</a> <a href="/tags/DB/" style="font-size: 10px;">DB</a> <a href="/tags/Devlopper/" style="font-size: 12.5px;">Devlopper</a> <a href="/tags/Dict/" style="font-size: 10px;">Dict</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Error-Handling/" style="font-size: 10px;">Error Handling</a> <a href="/tags/Framework/" style="font-size: 10px;">Framework</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/Gevent/" style="font-size: 10px;">Gevent</a> <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/Gunicorn/" style="font-size: 10px;">Gunicorn</a> <a href="/tags/HMM/" style="font-size: 17.5px;">HMM</a> <a href="/tags/History/" style="font-size: 10px;">History</a> <a href="/tags/Java/" style="font-size: 12.5px;">Java</a> <a href="/tags/JavaScript/" style="font-size: 12.5px;">JavaScript</a> <a href="/tags/Life/" style="font-size: 12.5px;">Life</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/Memory-Management/" style="font-size: 12.5px;">Memory Management</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NLP/" style="font-size: 10px;">NLP</a> <a href="/tags/NodeJs/" style="font-size: 17.5px;">NodeJs</a> <a href="/tags/Optimization/" style="font-size: 12.5px;">Optimization</a> <a href="/tags/PAAS/" style="font-size: 10px;">PAAS</a> <a href="/tags/POS/" style="font-size: 15px;">POS</a> <a href="/tags/Patch/" style="font-size: 10px;">Patch</a> <a href="/tags/Performance/" style="font-size: 10px;">Performance</a> <a href="/tags/Probabilistic-Gragh/" style="font-size: 10px;">Probabilistic Gragh</a> <a href="/tags/Profiling/" style="font-size: 10px;">Profiling</a> <a href="/tags/Programming/" style="font-size: 10px;">Programming</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/RESTful-API/" style="font-size: 10px;">RESTful API</a> <a href="/tags/RTSP/" style="font-size: 10px;">RTSP</a> <a href="/tags/Reading/" style="font-size: 10px;">Reading</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/Select/" style="font-size: 10px;">Select</a> <a href="/tags/Software-Engeering/" style="font-size: 10px;">Software Engeering</a> <a href="/tags/Software-Engineer/" style="font-size: 10px;">Software Engineer</a> <a href="/tags/System-admin/" style="font-size: 10px;">System admin</a> <a href="/tags/Thinking/" style="font-size: 10px;">Thinking</a> <a href="/tags/Ubuntu-Gnome/" style="font-size: 10px;">Ubuntu Gnome</a> <a href="/tags/UbuntuGnome/" style="font-size: 10px;">UbuntuGnome</a> <a href="/tags/Video-Streaming/" style="font-size: 10px;">Video Streaming</a> <a href="/tags/WSGI/" style="font-size: 12.5px;">WSGI</a> <a href="/tags/Web-Server/" style="font-size: 12.5px;">Web Server</a> <a href="/tags/Web-development/" style="font-size: 10px;">Web development</a> <a href="/tags/XMLHttpRequest/" style="font-size: 10px;">XMLHttpRequest</a> <a href="/tags/binary/" style="font-size: 10px;">binary</a> <a href="/tags/coroutine/" style="font-size: 10px;">coroutine</a> <a href="/tags/cors/" style="font-size: 10px;">cors</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/ftp-server/" style="font-size: 10px;">ftp server</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/history/" style="font-size: 10px;">history</a> <a href="/tags/html/" style="font-size: 10px;">html</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/latex/" style="font-size: 10px;">latex</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mathematic/" style="font-size: 10px;">mathematic</a> <a href="/tags/numbers/" style="font-size: 10px;">numbers</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/rethink/" style="font-size: 10px;">rethink</a> <a href="/tags/translate/" style="font-size: 10px;">translate</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/古诗/" style="font-size: 10px;">古诗</a> <a href="/tags/异步/" style="font-size: 10px;">异步</a> <a href="/tags/感悟/" style="font-size: 10px;">感悟</a> <a href="/tags/故事/" style="font-size: 10px;">故事</a> <a href="/tags/方法论/" style="font-size: 10px;">方法论</a> <a href="/tags/时政/" style="font-size: 10px;">时政</a> <a href="/tags/概率图模型/" style="font-size: 10px;">概率图模型</a> <a href="/tags/编程语言/" style="font-size: 10px;">编程语言</a> <a href="/tags/见闻/" style="font-size: 10px;">见闻</a> <a href="/tags/认知/" style="font-size: 10px;">认知</a> <a href="/tags/读书/" style="font-size: 12.5px;">读书</a> <a href="/tags/读研/" style="font-size: 10px;">读研</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a> <a href="/tags/隐马尔科夫模型/" style="font-size: 12.5px;">隐马尔科夫模型</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">I&#39;am interested something new and useful</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Archer Reilly</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="https://avatars3.githubusercontent.com/u/5053620?v=3&amp;s=460">
+				<hgroup>
+				  <h1 class="header-author">Archer Reilly</h1>
+				</hgroup>
+			</div>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/archives">All</a></li>
+		        
+					<li><a href="/">Home</a></li>
+		        
+					<li><a href="/categories/Linux">Linux</a></li>
+		        
+					<li><a href="/categories/DataLab">DataLab</a></li>
+		        
+					<li><a href="/categories/Programming-Language">Programming</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/csrgxtu" title="github">github</a>
+			        
+						<a class="linkedin" target="_blank" href="http://cn.linkedin.com/in/csrgxtu" title="linkedin">linkedin</a>
+			        
+						<a class="mail" target="_blank" href="/1246506786@qq.com" title="mail">mail</a>
+			        
+						<a class="quora" target="_blank" href="http://www.quora.com/Archer-Reilly-1" title="quora">quora</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/reilly-archer" title="zhihu">zhihu</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/111503895773523107943/posts" title="google">google</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-隐马尔科夫模型介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/19/隐马尔科夫模型介绍/" class="article-date">
+  	<time datetime="2015-03-19T00:18:48.000Z" itemprop="datePublished">2015-03-19</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      隐马尔科夫模型介绍
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HMM/">HMM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/隐马尔科夫模型/">隐马尔科夫模型</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/DataLab/">DataLab</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>这篇文章主要是阐述什么是HMM–隐马尔科夫模型。通过具体的例子来解释其应用。为了学习HMM模型，我参看了许多文章，书籍论文。觉得这些东西都太学术化了。我是数学系的学生，发现周围师兄老师学生都喜欢用纯数学概念理论公式给人讲道理，不是说了吗,</p>
+<blockquote>
+<p>一个数学公式吓走一半读者<br><br>一个定理引理证明推导使你觉得自己就是个傻子</p>
+</blockquote>
+<p>数学出身的人做大数据机器学习相关领域就是把数学看的太重了，觉得数学无所不能，数学太重要了。我十分佩服吴军博士的科研作风，其书籍<a href="http://book.douban.com/subject/26163454/" target="_blank" rel="noopener">《数学之美》</a>就很通俗易懂。还有就是像<a href="http://guidetodatamining.com/" target="_blank" rel="noopener">A Programmer’s Guide To Data Mining</a>这类资料。</p>
+<p>这篇文章不会十分深入公式的推导，定理引理的证明，只是通过通俗的语言阐释什么是HMM，能用来做什么？</p>
+<a id="more"></a>
+
+<h3 id="历史背景"><a href="#历史背景" class="headerlink" title="历史背景"></a>历史背景</h3><p>其实呢，从概率论开始，人们研究的对象基本都是关于随机变量X的概率分布问题，所以在概率论这门课程中，我们主要学习的是关于随机变量X的离散，连续分布，边缘分布，条件分布等一些东西。对于离散的一般使用对各个点求和的方法，对于连续的一般使用我们学习过的微积分处理。</p>
+<p>但是，若你仔细想一下，概率论所研究的随机变量不与时间有关系。如伯努力实验，根本就没有时间的概念。但是，现实生活中所出现的事件有许多是与时间相关联的。如一个人一天的生活状态是与时间有关联的，早上7点起床，12点吃饭等。</p>
+<p>若使用概率论的方法研究一个人一天的活动，当然可以，只是误差大，精确度不那么高而已。例如，使用变量<strong>X</strong>表示一个人所处的状态（起床，吃饭，学习，长厕所，洗碗，锻炼，洗澡等），那么就对应着X有个概率分布<strong>P(X)</strong>，若你想知道上厕所这个状态的概率，只要将这个状态带入到概率分布<strong>P(X)</strong>中去，查找或者计算出对应的概率即可。</p>
+<p>但是从常识我们可以知道或者总结出，一个人上厕所的状态与其它状态是有关联的，有一个先后的时序关系。如，一般上厕所会发生在早上刚起床后，或者吃完饭后，或者睡觉之前。这里有了一个先后关系，在<strong>t</strong>时刻干什么，可能影响到<strong>t+1</strong>时刻所做的事情，所以后一时刻的状态依赖与前一时刻的状态。而在概率论方法中，对于一天人的活动状态就没有考虑状态之间的时序关系。</p>
+<p>所以啊，那些数学家们就在想如何考虑时序性呢，慢慢的就有了随机过程这个新的领域。随机过程就是考虑到时间的条件下，随机变量<strong>X</strong>的概率分布问题，即时刻<strong>t</strong>的状态<strong>X(t)</strong>的概率分布依赖与时刻<strong>t-1</strong>的状态<strong>X(t-1)</strong>及之前所有状态。使用概率公式表达即为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EQ1: P(X(t)|X(t-1), X(t-2), ..., X(1))</span><br></pre></td></tr></table></figure>
+
+<p>这样考虑这个问题，就明显准确多了。但还不是绝对准确。这种从无时间观念到有时间观念，可是十九实际概率论到随机过程的一个质的飞跃。</p>
+<p>但是别高兴太早，因为仔细分析下_EQ1_，你会发现其计算并不简单，要计算<strong>t</strong>时刻的概率分布，就得知道前<strong>t-1</strong>个时刻的状态概率。为了解决这个问题，苏联数学家Markov认为当前的状态只与最近的状态相关，而不是与之前所有的状态相关，而这个_认为_就是Markov假设。所以经过Markov假设，_EQ1_变为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EQ2: P(X(t)|X(t-1), X(t-2), X(t-k)), k = &#123;1, ... t-1&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们不妨假设在厉害点，即时刻<strong>t</strong>的状态只依赖与前一个时刻<strong>t-1</strong>的状态，这就是一阶Markov过程的假设。那么_EQ2_就可以简化成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EQ3: P(X(t)|X(t-1))</span><br></pre></td></tr></table></figure>
+
+<p>从三个公式的变化可以看出，计算是愈来愈简单，但是精确度也在下降。但这至少也是个近似求解，相比与传统概率论的解法还是精确不少。</p>
+<h3 id="HMM-隐马尔科夫模型"><a href="#HMM-隐马尔科夫模型" class="headerlink" title="HMM 隐马尔科夫模型"></a>HMM 隐马尔科夫模型</h3><p>从前面的历史背景中，你应该了解到从概率论到随机过程到马尔科夫过程对同一个问题的解释。但是什么是隐马尔科夫模型呢？</p>
+<p>为了说明HMM，我们先从实际的问题着手。在自然语言处理中或者语音识别中有一种技术叫做词性标注，即Part of speech tagging，简称<a href="http://nlp.stanford.edu/software/tagger.shtml" target="_blank" rel="noopener">POS</a>。词性标注指给定一段英文句子，对于句子中的每个单词，标注其词性，如名词，动词，形容词等等。当然，如果你有的是时间和精力，那么可以手动标注，阅读句子，然后标注每个单词的词性。但是在NLP中，通常要处理的预料非常之庞大，所以需要计算机能快速自动的帮我们做好这个词性标注的工作。例如,对于句子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S = (s1, s2, ..., sn), 其中si是组成句子S的单词</span><br></pre></td></tr></table></figure>
+
+<p>我们要找出句子<strong>S</strong>对应的词性标注序列：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">O = (o1, o2, ..., on), 其中oi是对应的词性</span><br></pre></td></tr></table></figure>
+
+<p>但是，对于词性标注的数据集，我们一般只能从中得出可以观测到的单词序列<strong>S</strong>，而对于单词序列所对应的词性序列<strong>O</strong>，我们并不知道，暂且说是隐藏的。</p>
+<p>从上面的举例我们可以看出，不可直接观测的隐藏序列<strong>O</strong>之间是相互依赖的，至少现在时刻的oi依赖与前面的状态oi-1，这是显而易见的，因为一般来说动词的后面通常是名词或者副词。所以这个过程我们可以使用Markov过程模拟，又因为序列<strong>O</strong>是隐藏的不可直接观测得出的，所以在这个实际问题中，Markov过程就称作隐马尔科夫过程。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这篇文章先说到这里，完整的大概理解隐马尔科夫过程一篇文章也说不完，这里只是讲解最基本的背景及概念。要理解HMM的三个主要问题，请参考后续文章。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://book.douban.com/subject/26163454/" target="_blank" rel="noopener">数学之美</a> - 吴军 -  隐马尔科夫模型</p>
+<p><a href="http://book.douban.com/subject/10590856/" target="_blank" rel="noopener">统计学习方法</a> - 李航 - 隐马尔科夫模型</p>
+<p><a href="http://www.52nlp.cn/hmm-learn-best-practices-one-introduction" target="_blank" rel="noopener">HMM学习最佳范例一：介绍</a> - 52nlp</p>
+<p><a href="http://www.52nlp.cn/hmm-learn-best-practices-two-generating-patterns" target="_blank" rel="noopener">HMM学习最佳范例二：生成模式</a> - 52nlp</p>
+<p><a href="http://nlp.stanford.edu/software/tagger.shtml" target="_blank" rel="noopener">POS</a> - Stanford NLP</p>
+
+        
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/20/隐马尔科夫模型介绍（续）/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          隐马尔科夫模型介绍（续）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/03/18/我们这一代人的困惑/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">我们这一代人的困惑（转载TEDX）</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="隐马尔科夫模型介绍" data-title="隐马尔科夫模型介绍" data-url="http://yoursite.com/2015/03/19/隐马尔科夫模型介绍/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+<div id="gitalk-container"></div>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '79316428d5ae94aee3f9',
+    clientSecret: '31b6bbe3a461c683d9f7a07695c9e01ff7a092fa',
+    repo: 'gittalk',
+    owner: 'csrgxtu',
+    admin: ['csrgxtu'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+</script></div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2021 Archer Reilly
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/mobile.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
